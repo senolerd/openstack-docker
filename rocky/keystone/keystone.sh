@@ -13,9 +13,6 @@ function installing(){
 
 }
 
-
-
-
 function keystone_create_db(){
   mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $KEYSTONE_DB_NAME;"
   mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e" GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'%' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
