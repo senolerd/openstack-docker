@@ -29,17 +29,19 @@ function sql(){
 	  do
 	    if nc -z $MYSQL_HOST $MYSQL_PORT; then
 	      create_keystone_db 
+              break
             else
               echo "Waiting for SQL server up.. Last try: $(date)"
 	      sleep 1
 	    fi
+	  done
 	}
 
 
 
 
 package_installing
-
+sql
 
 end=$(date +%s)
 echo "EoF BOOTSTRAPING(started: $start, ended: $end, took $(expr $end - $start) secs   )"
