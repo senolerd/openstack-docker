@@ -3,7 +3,7 @@ start=$(date +%s)
 
 function package_installing(){
   apt-get update 
-  apt-get install netcat mariadb-client gcc libssl-dev
+  apt-get install -y netcat mariadb-client gcc libssl-dev
   cd /tmp
   git clone -b stable/rocky https://github.com/openstack/keystone.git
   cd keystone
