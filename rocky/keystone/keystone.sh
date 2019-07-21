@@ -33,9 +33,7 @@ function bootstrap_pipeline(){
 	}
 
 
-installing
-
-
+package_installing
 
 
 end=$(date +%s)
