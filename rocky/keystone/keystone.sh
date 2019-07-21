@@ -1,7 +1,8 @@
+start=$(date +%s)
 #!/bin/bash
 function installing(){
   apt-get update 
-  apt-get install netcat mariadb-client
+  apt-get install netcat mariadb-client gcc libssl-dev
   cd /tmp
   git clone -b stable/rocky https://github.com/openstack/keystone.git
   cd keystone
@@ -21,8 +22,8 @@ function keystone_create_db(){
   }
 
 function bootstrap_pipeline(){ 
-	keystone_create_db
 	installing
+	keystone_create_db
 	echo "EoF bootstrap pipeline"
 	}
 
@@ -45,7 +46,7 @@ function prepre_to_bootstrap(){
     done
 }
 
-prepre_to_bootstrap
-echo "EoF BOOTSTRAPING"
 
-sleep 1d
+end=$(date +%s)
+prepre_to_bootstrap
+echo "EoF BOOTSTRAPING(started: $start, ended: $end, took $(expr $end - $start) secs   )"
