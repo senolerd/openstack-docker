@@ -23,7 +23,7 @@ function keystone_create_db(){
 
 function bootstrap_pipeline(){ 
 	installing
-	keystone_create_db
+	# keystone_create_db
 	echo "EoF bootstrap pipeline"
 	}
 
