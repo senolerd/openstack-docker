@@ -1,7 +1,0 @@
-FROM python:3.7.4-slim
-ENV PATH /usr/local/bin:$PATH
-RUN apt-get update
-RUN apt-get install -y netcat mariadb-client
-COPY keystone.sh /tmp/
-CMD ["/tmp/keystone.sh"]
-#CMD ["/bin/sleep", "1d"]
