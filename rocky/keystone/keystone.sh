@@ -1,7 +1,7 @@
 start=$(date +%s)
 #!/bin/bash
 
-function installing(){
+function package_installing(){
   apt-get update 
   apt-get install netcat mariadb-client gcc libssl-dev
   cd /tmp
@@ -33,25 +33,7 @@ function bootstrap_pipeline(){
 	}
 
 
-function prepre_to_bootstrap(){
-  while true
-    do
-      if sql_connection_test
-        then
-          bootstrap_pipeline        
-          break
-      fi
-
-      echo "Connection test to sql server.. [ Last attempt: `date +%H:%M:%S` ]"
-      sql_connection_test
-      sleep 3
-    done
-}
-
-
 installing
-prepre_to_bootstrap
-
 
 
 
