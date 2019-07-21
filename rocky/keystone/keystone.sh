@@ -3,7 +3,7 @@ start=$(date +%s)
 
 function package_installing(){
   apt-get update 
-  apt-get install -y netcat mariadb-client gcc libssl-dev
+  # apt-get install -y netcat mariadb-client gcc libssl-dev
   cd /tmp
   git clone -b stable/rocky https://github.com/openstack/keystone.git
   cd keystone
@@ -15,22 +15,27 @@ function package_installing(){
 }
 
 
-function keystone_create_db(){
+function create_keystone_db(){
   mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $KEYSTONE_DB_NAME;"
-  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e" GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'%' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
+  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'%' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
   mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'localhost' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
-  unset -v MYSQL_ROOT_PASSWORD MYSQL_ALLOW_EMPTY_PASSWORD KEYSTONE_DB_NAME KEYSTONE_DB_USER KEYSTONE_USER_DB_PASS
+  echo "###########################"
+  echo "# DB CREATING IS DONE     #"
+  echo "###########################"
   }
 
-
-function sql_connection_test(){ 
-	nc -z $MYSQL_HOST $MYSQL_PORT 
+function sql(){
+	while true
+	  do
+	    if nc -z $MYSQL_HOST $MYSQL_PORT; then
+	      create_keystone_db 
+            else
+              echo "Waiting for SQL server up.. Last try: $(date)"
+	      sleep 1
+	    fi
 	}
 
-function bootstrap_pipeline(){ 
-	keystone_create_db
-	echo "EoF bootstrap pipeline"
-	}
+
 
 
 package_installing
