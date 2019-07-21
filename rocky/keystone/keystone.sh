@@ -1,5 +1,6 @@
 start=$(date +%s)
 #!/bin/bash
+
 function installing(){
   apt-get update 
   apt-get install netcat mariadb-client gcc libssl-dev
@@ -11,8 +12,8 @@ function installing(){
   echo "###########################"
   echo "# PACKAGE INSTALL IS DONE #"
   echo "###########################"
-
 }
+
 
 function keystone_create_db(){
   mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $KEYSTONE_DB_NAME;"
@@ -21,15 +22,16 @@ function keystone_create_db(){
   unset -v MYSQL_ROOT_PASSWORD MYSQL_ALLOW_EMPTY_PASSWORD KEYSTONE_DB_NAME KEYSTONE_DB_USER KEYSTONE_USER_DB_PASS
   }
 
-function bootstrap_pipeline(){ 
-	installing
-	# keystone_create_db
-	echo "EoF bootstrap pipeline"
-	}
 
 function sql_connection_test(){ 
 	nc -z $MYSQL_HOST $MYSQL_PORT 
 	}
+
+function bootstrap_pipeline(){ 
+	keystone_create_db
+	echo "EoF bootstrap pipeline"
+	}
+
 
 function prepre_to_bootstrap(){
   while true
@@ -47,6 +49,12 @@ function prepre_to_bootstrap(){
 }
 
 
-end=$(date +%s)
+installing
 prepre_to_bootstrap
+
+
+
+
+
+end=$(date +%s)
 echo "EoF BOOTSTRAPING(started: $start, ended: $end, took $(expr $end - $start) secs   )"
