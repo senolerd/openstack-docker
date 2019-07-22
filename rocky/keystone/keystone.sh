@@ -8,7 +8,7 @@ function package_installing(){
   git clone -b stable/rocky https://github.com/openstack/keystone.git
   cd keystone
   pip install -r requirements.txt
-  pip install pymysql
+  # pip install pymysql apache2 libapache2-mod-wsgi libapache2-mod-wsgi-py3
   python setup.py install
   echo "###########################"
   echo "# PACKAGE INSTALL IS DONE #"
@@ -53,6 +53,7 @@ function keystone_setup(){
   cd /tmp/keystone
   tox -egenconfig
   cp etc/* /etc/keystone/
+  cp /etc/keystone/logging.conf.sample /etc/keystone/logging.conf
   cp /etc/keystone/keystone.conf.sample /etc/keystone/keystone.conf
   sed -i "s|^\[database]|[database]\nconnection = mysql+pymysql://$KEYSTONE_DB_USER:$KEYSTONE_USER_DB_PASS@$MYSQL_HOST/$KEYSTONE_DB_NAME|g" /etc/keystone/keystone.conf
   sed -i "s|^\[token]|[token]\nprovider = fernet|g" /etc/keystone/keystone.conf
@@ -62,7 +63,24 @@ function keystone_setup(){
   keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
   keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
 
+  keystone-manage bootstrap --bootstrap-password adminpass \
+  --bootstrap-admin-url $KEYSTONE_ADMIN_ENDPOINT \
+  --bootstrap-internal-url $KEYSTONE_INTERNAL_ENDPOINT \
+  --bootstrap-public-url $KEYSTONE_PUBLIC_ENDPOINT \
+  --bootstrap-region-id $KEYSTONE_REGION
+
+  cp httpd/wsgi-keystone.conf /etc/apache2/sites-enabled/
+
+  /etc/init.d/apache2 start
+
+
+
+
+
   }
+
+
+
 
 package_installing
 sql
