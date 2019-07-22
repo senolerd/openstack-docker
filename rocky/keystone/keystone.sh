@@ -3,7 +3,7 @@ start=$(date +%s)
 
 function package_installing(){
   apt-get update 
-  # apt-get install -y netcat mariadb-client gcc libssl-dev libldap2-dev libsasl2-dev
+  # apt-get install -y netcat mariadb-client gcc libssl-dev libldap2-dev libsasl2-dev tox
   cd /tmp
   git clone -b stable/rocky https://github.com/openstack/keystone.git
   cd keystone
@@ -55,15 +55,18 @@ function keystone_setup(){
   cp /etc/keystone/keystone.conf.sample /etc/keystone/keystone.conf
   sed -i "s|database]|database]\nconnection = mysql+pymysql://$KEYSTONE_DB_USER:$KEYSTONE_USER_DB_PASS@$MYSQL_HOST/$KEYSTONE_DB_NAME|g" /etc/keystone/keystone.conf
   sed -i "s|token]|token]\nprovider = fernet|g" /etc/keystone/keystone.conf
+  check_permissions
+
   su -s /bin/sh -c "keystone-manage db_sync" keystone
   keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
   keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
 
-  check_permissions
   }
 
 package_installing
 sql
+keystone_setup
+
 
 end=$(date +%s)
 echo "EoF BOOTSTRAPING(started: $start, ended: $end, took $(expr $end - $start) secs   )"
