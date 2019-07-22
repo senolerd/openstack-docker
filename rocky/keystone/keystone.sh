@@ -3,7 +3,7 @@ start=$(date +%s)
 
 function package_installing(){
   apt-get update 
-  # apt-get install -y netcat mariadb-client gcc libssl-dev
+  # apt-get install -y netcat mariadb-client gcc libssl-dev libldap2-dev libsasl2-dev
   cd /tmp
   git clone -b stable/rocky https://github.com/openstack/keystone.git
   cd keystone
@@ -25,20 +25,42 @@ function create_keystone_db(){
   }
 
 function sql(){
-	while true
-	  do
-	    if nc -z $MYSQL_HOST $MYSQL_PORT; then
-	      create_keystone_db 
-              break
-            else
-              echo "Waiting for SQL server up.. Last try: $(date)"
-	      sleep 1
-	    fi
-	  done
-	}
+  while true
+    do
+      if nc -z $MYSQL_HOST $MYSQL_PORT; then
+        create_keystone_db 
+        break
+      else
+        echo "Waiting for SQL server up.. Last try: $(date)"
+        sleep 1
+      fi
+    done
+  }
 
 
+function check_permissions(){
+  chown -R keystone:keystone /var/log/keystone
+# chown -R keystone:keystone /var/lib/keystone
+  chown -R keystone:keystone /etc/keystone
+}
 
+
+function keystone_setup(){
+  useradd --home-dir "/var/lib/keystone" --create-home --system --shell /bin/false keystone
+  mkdir -p /var/log/keystone
+  mkdir -p /etc/keystone
+  cd /tmp/keystone
+  tox -egenconfig
+  cp etc/* /etc/keystone/
+  cp /etc/keystone/keystone.conf.sample /etc/keystone/keystone.conf
+  sed -i "s|database]|database]\nconnection = mysql+pymysql://$KEYSTONE_DB_USER:$KEYSTONE_USER_DB_PASS@$MYSQL_HOST/$KEYSTONE_DB_NAME|g" /etc/keystone/keystone.conf
+  sed -i "s|token]|token]\nprovider = fernet|g" /etc/keystone/keystone.conf
+  su -s /bin/sh -c "keystone-manage db_sync" keystone
+  keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+  keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+
+  check_permissions
+  }
 
 package_installing
 sql
