@@ -8,6 +8,7 @@ function package_installing(){
   git clone -b stable/rocky https://github.com/openstack/keystone.git
   cd keystone
   pip install -r requirements.txt
+  pip install pymysql
   python setup.py install
   echo "###########################"
   echo "# PACKAGE INSTALL IS DONE #"
@@ -53,8 +54,8 @@ function keystone_setup(){
   tox -egenconfig
   cp etc/* /etc/keystone/
   cp /etc/keystone/keystone.conf.sample /etc/keystone/keystone.conf
-  sed -i "s|database]|database]\nconnection = mysql+pymysql://$KEYSTONE_DB_USER:$KEYSTONE_USER_DB_PASS@$MYSQL_HOST/$KEYSTONE_DB_NAME|g" /etc/keystone/keystone.conf
-  sed -i "s|token]|token]\nprovider = fernet|g" /etc/keystone/keystone.conf
+  sed -i "s|^\[database]|database]\nconnection = mysql+pymysql://$KEYSTONE_DB_USER:$KEYSTONE_USER_DB_PASS@$MYSQL_HOST/$KEYSTONE_DB_NAME|g" /etc/keystone/keystone.conf
+  sed -i "s|^\[token]|token]\nprovider = fernet|g" /etc/keystone/keystone.conf
   check_permissions
 
   su -s /bin/sh -c "keystone-manage db_sync" keystone
