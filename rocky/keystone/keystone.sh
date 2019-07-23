@@ -3,16 +3,12 @@ start=$(date +%s)
 
 function package_installing(){
   apt-get update 
-  # apt-get install -y netcat mariadb-client gcc libssl-dev libldap2-dev libsasl2-dev tox
   cd /tmp
-  git clone -b stable/rocky https://github.com/openstack/keystone.git
+  git clone -b stable/$OS_VERSION https://github.com/openstack/keystone.git
   cd keystone
   pip install -r requirements.txt
-  # pip install pymysql apache2 libapache2-mod-wsgi libapache2-mod-wsgi-py3
   python setup.py install
-  echo "###########################"
   echo "# PACKAGE INSTALL IS DONE #"
-  echo "###########################"
 }
 
 
@@ -20,9 +16,7 @@ function create_keystone_db(){
   mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $KEYSTONE_DB_NAME;"
   mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'%' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
   mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'localhost' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
-  echo "###########################"
   echo "# DB CREATING IS DONE     #"
-  echo "###########################"
   }
 
 function sql(){
@@ -41,7 +35,6 @@ function sql(){
 
 function check_permissions(){
   chown -R keystone:keystone /var/log/keystone
-# chown -R keystone:keystone /var/lib/keystone
   chown -R keystone:keystone /etc/keystone
 }
 
@@ -68,29 +61,22 @@ function keystone_setup(){
   --bootstrap-region-id $KEYSTONE_REGION
 
   cp httpd/wsgi-keystone.conf /etc/apache2/sites-enabled/
-
-  /etc/init.d/apache2 start
-
-echo "
-export OS_USERNAME=admin
-export OS_PASSWORD=ADMIN_PASS
-export OS_PROJECT_NAME=admin
-export OS_USER_DOMAIN_NAME=Default
-export OS_PROJECT_DOMAIN_NAME=Default
-export OS_AUTH_URL=http://api:5000/v3
-export OS_IDENTITY_API_VERSION=3
-" > /admin-rc
-
-
+  touch /tmp/keystone_done
   }
 
 
+function keystone_pipeline(){
+  if [ ! -f /tmp/keystone_done ] ; then 
+    package_installing
+    sql
+    keystone_setup
+  fi
 
-
-package_installing
-sql
-keystone_setup
+  /etc/init.d/apache2 start
+  }
 
 
 end=$(date +%s)
-echo "EoF BOOTSTRAPING(started: $start, ended: $end, took $(expr $end - $start) secs   )"
+echo "EoF for $OS_VERSION BOOTSTRAPING (started: $start, ended: $end, took $(expr $end - $start) secs   )"
+
+keystone_pipeline
