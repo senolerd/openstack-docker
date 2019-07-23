@@ -64,7 +64,6 @@ function keystone_setup(){
   keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
 
   keystone-manage bootstrap --bootstrap-password adminpass \
-  --bootstrap-internal-url $KEYSTONE_INTERNAL_ENDPOINT \
   --bootstrap-public-url $KEYSTONE_PUBLIC_ENDPOINT \
   --bootstrap-region-id $KEYSTONE_REGION
 
