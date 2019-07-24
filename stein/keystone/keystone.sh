@@ -1,5 +1,5 @@
-start=$(date +%s)
 #!/bin/bash
+start=$(date +%s)
 
 function package_installing(){
   apt-get update 
