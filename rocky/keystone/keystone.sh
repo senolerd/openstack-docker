@@ -33,6 +33,7 @@ function sql(){
 function check_permissions(){
   chown -R root:keystone /etc/keystone
   chmod 640 -R root:keystone /etc/keystone
+  chmod 750  root:keystone /etc/keystone
 }
 
 
@@ -50,7 +51,12 @@ function keystone_setup(){
   --bootstrap-public-url $KEYSTONE_PUBLIC_ENDPOINT \
   --bootstrap-region-id $KEYSTONE_REGION
 
+  ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
+
   check_permissions
+
+  systemctl enable httpd.service
+  systemctl start httpd.service
   }
 
 
