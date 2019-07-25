@@ -1,4 +1,4 @@
-admin-rc  
-Dockerfile_centos_keystone_aio  
-keystone.yml  
+admin-rc
+Dockerfile_centos_keystone_aio
+keystone.yml
 openstack.env
