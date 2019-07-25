@@ -56,7 +56,7 @@ function keystone_setup(){
 function keystone_pipeline(){
   if [ ! -f /tmp/keystone_done ] ; then 
     package_installing
-    sql
+#    sql
 #    keystone_setup
   fi
 
