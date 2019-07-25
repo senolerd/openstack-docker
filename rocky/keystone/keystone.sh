@@ -44,6 +44,8 @@ function keystone_setup(){
 
   su -s /bin/sh -c "keystone-manage db_sync" keystone
 
+  check_permissions
+
   keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
   keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
 
@@ -53,7 +55,6 @@ function keystone_setup(){
 
   ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
 
-  check_permissions
 
   systemctl enable httpd.service
   systemctl start httpd.service
