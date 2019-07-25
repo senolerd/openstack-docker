@@ -3,8 +3,9 @@
 start=$(date +%s)
 
 function package_installing(){
-  yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient openstack-keystone httpd mod_wsgi mariadb
-  echo "# DB CREATING IS DONE     #"
+  yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb 
+  yum install -y openstack-keystone
+  echo "# PACKAGE INSTALLING IS DONE     #"
 }
 
 
