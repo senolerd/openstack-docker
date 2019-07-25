@@ -1,0 +1,6 @@
+FROM centos
+ENV 
+RUN apt-get update && apt-get install -y gcc 
+RUN pip install python-openstackclient==3.19.0
+COPY admin-rc /
+CMD ["/keystone_entrypoint.sh"]

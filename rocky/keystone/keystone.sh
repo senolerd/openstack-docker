@@ -5,6 +5,7 @@ start=$(date +%s)
 function package_installing(){
   yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb 
   yum install -y openstack-keystone python-openstackclient
+  yum clean packages
   echo "# PACKAGE INSTALLING IS DONE     #"
 }
 
