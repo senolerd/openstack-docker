@@ -62,7 +62,7 @@ function keystone_setup(){
   ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
   
   # Ryan the fire starter
-  ryans_token=$(openstack token issue -f value  --os-auth-url $KEYSTONE_PUBLIC_ENDPOINT --os-identity-api-version 3 --os-project-domain-name Default --os-user-domain-name Default --os-project-name admin --os-password $ADMIN_PASS --os-username admin|grep '^gAAA')
+  ryans_token=$(openstack token issue -f value  --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3 --os-project-domain-name Default --os-user-domain-name Default --os-project-name admin --os-password $ADMIN_PASS --os-username admin|grep '^gAAA')
   alias openstack="--os-token $ryans_token --os-url $KEYSTONE_PUBLIC_ENDPOINT"
 
   openstack domain create --description "An Example Domain" example
