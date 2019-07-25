@@ -31,19 +31,18 @@ function sql(){
 
 
 function check_permissions(){
-  chown -R keystone:keystone /etc/keystone
+  chown -R root:keystone /etc/keystone
+  chmod 640 -R root:keystone /etc/keystone
 }
 
 
 function keystone_setup(){
-  cp /etc/keystone/logging.conf.sample /etc/keystone/logging.conf
-  cp /etc/keystone/keystone.conf.sample /etc/keystone/keystone.conf
+
   sed -i "s|^\[database]|[database]\nconnection = mysql+pymysql://$KEYSTONE_DB_USER:$KEYSTONE_USER_DB_PASS@$MYSQL_HOST/$KEYSTONE_DB_NAME|g" /etc/keystone/keystone.conf
   sed -i "s|^\[token]|[token]\nprovider = fernet|g" /etc/keystone/keystone.conf
 
-  check_permissions
-
   su -s /bin/sh -c "keystone-manage db_sync" keystone
+
   keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
   keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
 
@@ -51,6 +50,7 @@ function keystone_setup(){
   --bootstrap-public-url $KEYSTONE_PUBLIC_ENDPOINT \
   --bootstrap-region-id $KEYSTONE_REGION
 
+  check_permissions
   }
 
 
