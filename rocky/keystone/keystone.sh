@@ -19,7 +19,7 @@ function create_keystone_db(){
 function sql(){
   while true
     do
-      if nc -z $MYSQL_HOST $MYSQL_PORT; then
+      if  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e 'quit' ; then
         create_keystone_db 
         break
       else
