@@ -4,8 +4,7 @@ start=$(date +%s)
 
 function package_installing(){
   yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb 
-  yum install -y openstack-keystone
-  pip install python-openstackclient==3.19.0
+  yum install -y openstack-keystone python-openstackclient
   echo "# PACKAGE INSTALLING IS DONE     #"
 }
 
@@ -62,17 +61,16 @@ function keystone_setup(){
   # Copy keystone's public endpoint wsgi conf
   ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
   
-  # ryan the fire starter
-  # ryans_token=$(openstack token issue -f value  --os-auth-url $KEYSTONE_PUBLIC_ENDPOINT --os-project-domain-name Default --os-user-domain-name Default --os-project-name admin --os-password $ADMIN_PASS --os-username admin|grep '^gAAA')
+  # Ryan the fire starter
+  ryans_token=$(openstack token issue -f value  --os-auth-url $KEYSTONE_PUBLIC_ENDPOINT --os-identity-api-version 3 --os-project-domain-name Default --os-user-domain-name Default --os-project-name admin --os-password $ADMIN_PASS --os-username admin|grep '^gAAA')
+  alias openstack="--os-token $ryans_token --os-url $KEYSTONE_PUBLIC_ENDPOINT"
 
-
-  # openstack endpoint list --os-token $ryans_token --os-url $KEYSTONE_PUBLIC_ENDPOINT 
-
-
-
-
-
-
+  openstack domain create --description "An Example Domain" example
+  openstack project create --domain default --description "Service Project" service 
+  openstack project create --domain default --description "Demo Project" myproject
+  openstack user create --domain default --password myuserpass myuser
+  openstack role create myrole
+  openstack role add --project myproject --user myuser myrole
 
 
   }
