@@ -71,7 +71,7 @@ function keystone_pipeline(){
   end=$(date +%s)
   echo "EoF for $OS_VERSION BOOTSTRAPING (started: $start, ended: $end, took $(expr $end - $start) secs   )"
 #  /etc/init.d/apache2 start
-   sleep 666d
+   httpd
   }
 
 
