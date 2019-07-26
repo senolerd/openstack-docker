@@ -26,20 +26,12 @@ function openstackclient_pipeline(){
 
           alias openstack="openstack --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3"
 
-          openstack domain create --description "An Example Domain" example 
-          openstack project create --domain default --description "Service Project" service 
-          openstack project create --domain default --description "Demo Project" myproject 
-          openstack user create --domain default --password myuserpass myuser 
-          openstack role create myrole --os-token  
-          openstack role add --project myproject --user myuser myrole  
-
-#          openstack domain create --description "An Example Domain" example --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
-#          openstack project create --domain default --description "Service Project" service --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
-#          openstack project create --domain default --description "Demo Project" myproject --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
-#          openstack user create --domain default --password myuserpass myuser --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
-#          openstack role create myrole --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
-#          openstack role add --project myproject --user myuser myrole  --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
-
+          openstack domain create --description "An Example Domain" example --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
+          openstack project create --domain default --description "Service Project" service --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
+          openstack project create --domain default --description "Demo Project" myproject --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
+          openstack user create --domain default --password myuserpass myuser --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
+          openstack role create myrole --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
+          openstack role add --project myproject --user myuser myrole  --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
 
           break
         else
