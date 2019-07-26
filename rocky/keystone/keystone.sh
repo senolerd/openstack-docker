@@ -33,8 +33,8 @@ function sql(){
 
 function check_permissions(){
   chown -R root:keystone /etc/keystone
-  chmod 640 -R root:keystone /etc/keystone
-  chmod 750  root:keystone /etc/keystone
+  chmod 640 -R  /etc/keystone
+  chmod 750 /etc/keystone
 }
 
 
