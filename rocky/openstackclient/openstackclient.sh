@@ -3,7 +3,8 @@ i#!/bin/bash
 start=$(date +%s)
 
 function package_installing(){
-  yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient
+  yum install -y centos-release-openstack-$OS_VERSION
+  yum install -y python-openstackclient
   yum clean packages
   echo "# PACKAGE INSTALLING IS DONE     #"
   }
