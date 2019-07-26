@@ -8,6 +8,10 @@ function package_installing(){
   yum clean packages
   echo "# PACKAGE INSTALLING IS DONE     #"
   }
+#      if ryans_token=$(openstack token issue -f value  --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT \
+#       --os-identity-api-version 3 --os-project-domain-name Default --os-user-domain-name Default \
+#       --os-project-name admin --os-password $ADMIN_PASS --os-username admin|grep '^gAAA')
+
 
 
 function openstackclient_pipeline(){
@@ -15,21 +19,26 @@ function openstackclient_pipeline(){
 
   while true
     do
-      if `ryans_token=$(openstack token issue -f value  --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT \
+      if openstack token issue -f value  --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT \
        --os-identity-api-version 3 --os-project-domain-name Default --os-user-domain-name Default \
-       --os-project-name admin --os-password $ADMIN_PASS --os-username admin|grep '^gAAA')`  ; then
-          
-        alias openstack="openstack --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3"
-        openstack domain create --description "An Example Domain" example
-        openstack project create --domain default --description "Service Project" service 
-        openstack project create --domain default --description "Demo Project" myproject
-        openstack user create --domain default --password myuserpass myuser
-        openstack role create myrole
-        openstack role add --project myproject --user myuser myrole
-        break
-      else
-        echo "Waiting for api server (Last tried: $(date))"
-        sleep 1
+       --os-project-name admin --os-password $ADMIN_PASS --os-username admin
+
+        then
+         ryans_token=$(openstack token issue -f value  --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT \
+         --os-identity-api-version 3 --os-project-domain-name Default --os-user-domain-name Default \
+         --os-project-name admin --os-password $ADMIN_PASS --os-username admin|grep '^gAAA')
+
+          alias openstack="openstack --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3"
+          openstack domain create --description "An Example Domain" example
+          openstack project create --domain default --description "Service Project" service 
+          openstack project create --domain default --description "Demo Project" myproject
+          openstack user create --domain default --password myuserpass myuser
+          openstack role create myrole
+          openstack role add --project myproject --user myuser myrole
+          break
+        else
+          echo "Waiting for api server (Last tried: $(date))"
+          sleep 1
       fi
     done
 
