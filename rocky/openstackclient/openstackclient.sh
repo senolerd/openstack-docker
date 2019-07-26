@@ -24,6 +24,12 @@ function openstackclient_pipeline(){
          --os-identity-api-version 3 --os-project-domain-name Default --os-user-domain-name Default \
          --os-project-name admin --os-password $ADMIN_PASS --os-username admin|grep '^gAAA'`
 
+  	  echo "###########################################################"
+	  echo "###########################################################"
+          echo "RYAN TOKEN: $ryans_token"
+  	  echo "###########################################################"
+  	  echo "###########################################################"
+
           alias openstack="openstack --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3"
           openstack domain create --description "An Example Domain" example
           openstack project create --domain default --description "Service Project" service 
