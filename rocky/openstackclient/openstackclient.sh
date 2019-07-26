@@ -30,13 +30,13 @@ function openstackclient_pipeline(){
   	  echo "###########################################################"
   	  echo "###########################################################"
 
-          # alias openstack="openstack --os-token $ryans_token --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3"
-          openstack domain create --description "An Example Domain" example --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
-          openstack project create --domain default --description "Service Project" service --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
-          openstack project create --domain default --description "Demo Project" myproject --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
-          openstack user create --domain default --password myuserpass myuser --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
-          openstack role create myrole --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
-          openstack role add --project myproject --user myuser myrole --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
+          # alias openstack="openstack --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3"
+          openstack domain create --description "An Example Domain" example --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
+          openstack project create --domain default --description "Service Project" service --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
+          openstack project create --domain default --description "Demo Project" myproject --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
+          openstack user create --domain default --password myuserpass myuser --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
+          openstack role create myrole --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
+          openstack role add --project myproject --user myuser myrole  --os-token $ryans_token --os-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3
           break
         else
           echo "Waiting for api server (Last tried: $(date))"
