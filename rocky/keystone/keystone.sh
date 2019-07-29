@@ -55,31 +55,33 @@ function install_additional_node(){
     keystone_setup
     }
 
-function sql_connection_check(){
-while true
-    do
-      if  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e 'quit' ; then
-        echo "SQL connected. $(date)"
-        if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' ; then
-          echo "Installing additional api node."
-          install_additional_node
-        else:
-          echo "New api node node installing."
-          install_first_node
-        fi
-        break
-      else
-        echo "Waiting for SQL server up.. Last trying time: $(date)"
-        sleep 1
-      fi
-    done
-}
+function main(){
+    while true
+        do
+          if  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e 'quit' ; then
+            echo "SQL connected. $(date)"
+            if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' ; then
+              echo "Installing additional api node."
+              install_additional_node
+            else:
+              echo "Installing new api node node ."
+              install_first_node
+            fi
+            break
+          else
+            echo "Waiting for SQL server up.. Last trying time: $(date)"
+            sleep 1
+          fi
+        done
+    end=$(date +%s)
+    echo "EoF for $OS_VERSION installing report. (started: $start, ended: $end, took $(expr $end - $start) secs   )"
+    httpd -DFOREGROUND
+    }
+
+main
 
 
-end=$(date +%s)
-echo "EoF for $OS_VERSION installing report. (started: $start, ended: $end, took $(expr $end - $start) secs   )"
 
-httpd -DFOREGROUND
 
 
 
