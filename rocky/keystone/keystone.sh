@@ -36,8 +36,8 @@ function populate_keystone(){
     --bootstrap-public-url $KEYSTONE_PUBLIC_ENDPOINT \
     --bootstrap-internal-url $KEYSTONE_INTERNAL_ENDPOINT \
     --bootstrap-region-id $KEYSTONE_REGION
-    ryans_token=$(openstack token issue -f value  --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3 --os-project-domain-name Default --os-user-domain-name Default --os-project-name admin --os-password $ADMIN_PASS --os-username admin|grep '^gAAA')
-    openstack project create service --domain default --description "Service Project" --os-token $ryans_token --os-url $KEYSTONE_PUBLIC_ENDPOINT
+    # ryans_token=$(openstack token issue -f value  --os-auth-url $KEYSTONE_INTERNAL_ENDPOINT --os-identity-api-version 3 --os-project-domain-name Default --os-user-domain-name Default --os-project-name admin --os-password $ADMIN_PASS --os-username admin|grep '^gAAA')
+    # openstack project create service --domain default --description "Service Project" --os-token $ryans_token --os-url $KEYSTONE_PUBLIC_ENDPOINT
   }
 
 function install_first_node(){
