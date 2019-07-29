@@ -58,9 +58,9 @@ function install_additional_node(){
 function sql_connection_check(){
     while true
       do
-        if  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e 'quit' ; then  #if there is sql connection
+        if  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e 'quit' ; then
           echo "SQL connected. $(date)"
-          if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' ; then #check keystone login
+          if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' ; then
             echo "Installing additional api node."
             install_additional_node
           else:
