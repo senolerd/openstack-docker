@@ -6,10 +6,6 @@ start=$(date +%s)
     yum clean all
     echo "# PACKAGE INSTALLING IS DONE #"
 
-# Start the stark with single api, then add. Additional nodes must check current installation and shouldn't push db sync
-# * after the installation, mysql client should check the keystone db, then has to take its own way.
-
-
 function create_keystone_db(){
     mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $KEYSTONE_DB_NAME;"
     mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'%' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
@@ -44,7 +40,6 @@ function populate_keystone(){
     openstack project create service --domain default --description "Service Project" --os-token $ryans_token --os-url $KEYSTONE_PUBLIC_ENDPOINT
   }
 
-
 function install_first_node(){
     create_keystone_db
     keystone_setup
@@ -59,18 +54,19 @@ function main(){
     while true
         do
           if  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e 'quit' ; then
-            echo "SQL connected. $(date)"
-            if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' ; then
-              echo "Installing additional api node."
-              install_additional_node
-            else:
-              echo "Installing new api node node ."
-              install_first_node
-            fi
-            break
+                echo "SQL connected. $(date)"
+                if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' ; then
+                  echo "Installing additional api node."
+                  install_additional_node
+                else
+                  echo "Installing new api node node ."
+                  install_first_node
+                fi
+
+                break
           else
-            echo "Waiting for SQL server up.. Last trying time: $(date)"
-            sleep 1
+                echo "Waiting for SQL server up.. Last trying time: $(date)"
+                sleep 1
           fi
         done
     end=$(date +%s)
