@@ -55,7 +55,7 @@ function main(){
         do
           if  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e 'quit' ; then
                 echo "SQL connected. $(date)"
-                if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' ; then
+                if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' > /dev/null ; then
                   echo "Installing additional api node."
                   install_additional_node
                 else
