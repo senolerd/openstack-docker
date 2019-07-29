@@ -56,23 +56,24 @@ function install_additional_node(){
     }
 
 function sql_connection_check(){
-    while true
-      do
-        if  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e 'quit' ; then
-          echo "SQL connected. $(date)"
-          if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' ; then
-            echo "Installing additional api node."
-            install_additional_node
-          else:
-            echo "New api node node installing."
-            install_first_node
-          break
-        else
-          echo "Waiting for SQL server up.. Last trying time: $(date)"
-          sleep 1
+while true
+    do
+      if  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e 'quit' ; then
+        echo "SQL connected. $(date)"
+        if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' ; then
+          echo "Installing additional api node."
+          install_additional_node
+        else:
+          echo "New api node node installing."
+          install_first_node
         fi
-      done
-    }
+        break
+      else
+        echo "Waiting for SQL server up.. Last trying time: $(date)"
+        sleep 1
+      fi
+    done
+}
 
 
 end=$(date +%s)
