@@ -25,8 +25,17 @@ function keystone_setup(){
     sed -i "s|^\[token]|[token]\nprovider = fernet|g" /etc/keystone/keystone.conf
     check_permissions
 
-    keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
-    keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+    mkdir /etc/keystone/fernet-keys
+    mkdir /etc/keystone/credential-keys
+    chown keystone:keystone /etc/keystone/fernet-keys /etc/keystone/credential-keys
+    ln -s /run/secret/fernet_0 /etc/keystone/fernet-keys/0
+    ln -s /run/secret/fernet_1 /etc/keystone/fernet-keys/1
+    ln -s /run/secret/credential_0 /etc/keystone/credential-keys/0
+    ln -s /run/secret/credential_1 /etc/keystone/credential-keys/1
+
+    # keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+    # keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+
     ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
     }
 
