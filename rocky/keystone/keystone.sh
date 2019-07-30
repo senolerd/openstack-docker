@@ -24,8 +24,10 @@ function keystone_setup(){
     sed -i "s|^\[database]|[database]\nconnection = mysql+pymysql://$KEYSTONE_DB_USER:$KEYSTONE_USER_DB_PASS@$MYSQL_HOST/$KEYSTONE_DB_NAME|g" /etc/keystone/keystone.conf
     sed -i "s|^\[token]|[token]\nprovider = fernet|g" /etc/keystone/keystone.conf
     check_permissions
-    keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
-    keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+    chown keystone:keystone /tmp/credential_*
+    chown keystone:keystone /tmp/fernet_*
+    # keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+    # keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
     ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
     }
 
@@ -55,14 +57,13 @@ function main(){
         do
           if  mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e 'quit' ; then
                 echo "SQL connected. $(date)"
-                if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' > /dev/null ; then
+                if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' 2> /dev/null ; then
                   echo "Installing additional api node."
                   install_additional_node
                 else
                   echo "Installing new api node node ."
                   install_first_node
                 fi
-
                 break
           else
                 echo "Waiting for SQL server up.. Last trying time: $(date)"
