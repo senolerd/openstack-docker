@@ -24,10 +24,9 @@ function keystone_setup(){
     sed -i "s|^\[database]|[database]\nconnection = mysql+pymysql://$KEYSTONE_DB_USER:$KEYSTONE_USER_DB_PASS@$MYSQL_HOST/$KEYSTONE_DB_NAME|g" /etc/keystone/keystone.conf
     sed -i "s|^\[token]|[token]\nprovider = fernet|g" /etc/keystone/keystone.conf
     check_permissions
-    chown keystone:keystone /tmp/credential_*
-    chown keystone:keystone /tmp/fernet_*
-    # keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
-    # keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+
+    keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+    keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
     ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
     }
 
