@@ -1,0 +1,83 @@
+version: "3.1"
+services:
+  api:
+    image: centos:latest
+    command: |
+              bash -c " curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/generic/keystone/keystone.sh -o /keystone_entrypoint.sh
+                       chmod +x /keystone_entrypoint.sh
+                       /keystone_entrypoint.sh
+                       /bin/b`ash || exit 0"
+    deploy:
+      replicas: 3
+#      placement:
+#        constraints: [ node.labels.type == static ]
+    restart: always
+    ports:
+      - 5000:5000
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    env_file:
+      - openstack.env
+
+    secrets:
+      - source: credential_0
+        target: credential_0
+        uid: '163'
+        gid: '163'
+        mode: 0600
+
+      - source: credential_1
+        target: credential_1
+        uid: '163'
+        gid: '163'
+        mode: 0600
+
+      - source: fernet_0
+        target: fernet_0
+        uid: '163'
+        gid: '163'
+        mode: 0600
+
+      - source: fernet_1
+        target: fernet_1
+        uid: '163'
+        gid: '163'
+        mode: 0600
+
+  db:
+    image: mariadb:10.3.15
+    restart: always
+    ports:
+      - 3306:3306
+    dns:
+      - 8.8.8.8
+#      - 8.8.4.4
+    env_file:
+     - openstack.env
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  memcached:
+    image: memcached:alpine
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3.7.17-rc.1-alpine
+    restart: always
+    env_file:
+     - openstack.env
+
+secrets:
+  credential_0:
+    external: true
+  credential_1:
+    external: true
+  fernet_0:
+    external: true
+  fernet_1:
+    external: true
