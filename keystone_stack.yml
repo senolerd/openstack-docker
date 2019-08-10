@@ -3,7 +3,7 @@ services:
   api:
     image: centos:latest
     command: |
-              bash -c " curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/generic/keystone/keystone.sh -o /keystone_entrypoint.sh
+              bash -c " curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/keystone.sh -o /keystone_entrypoint.sh
                        chmod +x /keystone_entrypoint.sh
                        /keystone_entrypoint.sh
                        /bin/b`ash || exit 0"
