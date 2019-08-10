@@ -6,7 +6,7 @@ services:
               bash -c " curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/keystone.sh -o /keystone_entrypoint.sh
                        chmod +x /keystone_entrypoint.sh
                        /keystone_entrypoint.sh
-                       /bin/b`ash || exit 0"
+                       /bin/bash || exit 0"
     deploy:
       replicas: 3
 #      placement:
