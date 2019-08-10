@@ -1,4 +1,5 @@
 version: "3.1"
+
 services:
   api:
     image: centos:latest
@@ -52,7 +53,7 @@ services:
       - 3306:3306
     dns:
       - 8.8.8.8
-#      - 8.8.4.4
+      - 8.8.4.4
     env_file:
      - openstack.env
 
@@ -71,6 +72,20 @@ services:
     restart: always
     env_file:
      - openstack.env
+
+
+# These are the initial fernet keys. Need to be saved as a docker secret with name as secret before starting the stack.
+# Keystoe's api servers will mount them as their fernet keys.
+#
+# DOCKER SECRETS AND VALUES TO BE SAVED TO SWARMED DOCKER
+# fernet_0: DcieLAHZcz_pfc8ngIXiDFSVn9R5Jb0DqivAhLVXZCk=
+# fernet_1: hFZdwewAkARAr-Ey-9bwvLSN9MGEL_PUnaWVM4Cf6mE=
+# crediendial_0: CLOnhFQOoDHfiPpiJkN3LWTmylhanixBs__8HLRe92Q=
+# crediendial_1: 0kkN87jywQlDlwMS0ySRIzB752OFmSlhz6QyxvO_l78=
+#
+# echo 'asdfad' | docker secret create credential_0 -
+#
+# (the dash end of the command is included to command)
 
 secrets:
   credential_0:
