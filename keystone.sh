@@ -13,7 +13,8 @@ echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
 echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
 
     yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb
-    yum install -y openstack-keystone python-openstackclient
+    yum install -y openstack-keystone
+#    yum install -y openstack-keystone python-openstackclient
     yum clean all
     echo "# INFO: PACKAGE INSTALLING IS DONE #"
 
@@ -44,7 +45,6 @@ function keystone_setup(){
     ln -s /run/secrets/fernet_1 /etc/keystone/fernet-keys/1
     ln -s /run/secrets/credential_0 /etc/keystone/credential-keys/0
     ln -s /run/secrets/credential_1 /etc/keystone/credential-keys/1
-    ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
     }
 
 function populate_keystone(){
@@ -52,21 +52,18 @@ function populate_keystone(){
     PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
 
     if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]
-      then PROTO=https
+      then
+        PROTO=https
       else PROTO=http
-    fi
+        ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
+    sed -i "s|^Listen 5000|Listen 5000\n ServerName $DOCKER_HOST_ADDR|g" /etc/keystone/keystone.conf
 
-    echo "########## KEYSTONE MANAGE START"
-    echo "########## KEYSTONE MANAGE START"
+    fi
 
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
     --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$PUBLIC_ENDPOINT_PORT/$PUBLIC_ENDPOINT_VERSION \
     --bootstrap-internal-url http://$KEYSTONE_HOST:$INTERNAL_ENDPOINT_PORT/$INTERNAL_ENDPOINT_VERSION \
     --bootstrap-region-id $KEYSTONE_REGION
-    echo "########## KEYSTONE MANAGE START"
-    echo "########## KEYSTONE MANAGE START"
-
-
   }
 
 function install_first_node(){
