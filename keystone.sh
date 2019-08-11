@@ -41,15 +41,15 @@ function populate_keystone(){
     su -s /bin/sh -c "keystone-manage db_sync" keystone
     PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
 
-    if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]; then
-        PROTO=https
-    else
-        PROTO=http
-        cp /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
+    if [ "$PUBLIC_ENDPOINT_TLS" == "true" ];
+        then
+            PROTO=https
+        else
+            PROTO="http"
+            cp /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
+            sed -i "s|Listen 5000|Listen 5000\n ServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
     fi
 
-
-#    sed -i "s|Listen 5000|Listen 5000\n ServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
 
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
     --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$PUBLIC_ENDPOINT_PORT/$PUBLIC_ENDPOINT_VERSION \
