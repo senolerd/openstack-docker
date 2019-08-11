@@ -41,14 +41,14 @@ function populate_keystone(){
     su -s /bin/sh -c "keystone-manage db_sync" keystone
     PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
 
-    if [ "$PUBLIC_ENDPOINT_TLS" == "true" ];
-        then
-            PROTO="https"
-        else
-            PROTO="http"
-            echo "#########################################"
-            echo "########## HTTP INSTALL      ############"
-            echo "#########################################"
+    if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]
+    then
+        PROTO="https"
+    else
+        PROTO="http"
+        echo "#########################################"
+        echo "########## HTTP INSTALL      ############"
+        echo "#########################################"
     fi
 
     cp /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
