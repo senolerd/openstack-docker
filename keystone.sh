@@ -35,6 +35,7 @@ function keystone_setup(){
     ln -s /run/secrets/fernet_1 /etc/keystone/fernet-keys/1
     ln -s /run/secrets/credential_0 /etc/keystone/credential-keys/0
     ln -s /run/secrets/credential_1 /etc/keystone/credential-keys/1
+    ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
     }
 
 function populate_keystone(){
@@ -51,7 +52,6 @@ function populate_keystone(){
         echo "########         PROTO=http           ######"
         echo "############################################"
         echo "############################################"
-        ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
         sed -i "s|^Listen 5000|Listen 5000\n ServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
     fi
 
