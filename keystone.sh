@@ -42,8 +42,10 @@ function populate_keystone(){
     PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
 
     if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]
-      then PROTO=https
-      else PROTO=http
+      then
+        PROTO=https
+      else
+        PROTO=http
     fi
 
     ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
