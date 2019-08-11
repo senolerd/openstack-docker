@@ -1,6 +1,6 @@
 #!/bin/bash
 start=$(date +%s)
-DOCKER_HOST_ADDR=$(env $DOCKER_HOST |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
+#DOCKER_HOST_ADDR=$(env $DOCKER_HOST |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
 echo "####### DOCKER HOST: $DOCKER_HOST ########### "
 echo "####### DOCKER HOST: $DOCKER_HOST ########### "

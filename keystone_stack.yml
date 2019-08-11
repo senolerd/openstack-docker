@@ -20,6 +20,8 @@ services:
       - 8.8.4.4
     env_file:
       - openstack.env
+    environment:
+      - DOCKER_HOST=$DOCKER_HOST
     secrets:
       - source: credential_0
         target: credential_0
