@@ -35,31 +35,28 @@ function keystone_setup(){
     ln -s /run/secrets/fernet_1 /etc/keystone/fernet-keys/1
     ln -s /run/secrets/credential_0 /etc/keystone/credential-keys/0
     ln -s /run/secrets/credential_1 /etc/keystone/credential-keys/1
+    ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
 
 
+    sed -i "s|Listen 5000|Listen 5000\nServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
+
+    PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
+    if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]
+        then
+            PROTO="https"
+            echo "#########################################"
+            echo "########## HTTPS INSTALL     ############"
+            echo "#########################################"
+        else
+            PROTO="http"
+            echo "#########################################"
+            echo "########## HTTP INSTALL      ############"
+            echo "#########################################"
+    fi
     }
 
 function populate_keystone(){
-#    PROTO="http"
     su -s /bin/sh -c "keystone-manage db_sync" keystone
-    ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
-#    sed -i "s|Listen 5000|Listen 5000\nServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
-
-#    PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
-
-
-
-#    if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]
-#    then
-#        PROTO="https"
-#    else
-#        PROTO="http"
-#        echo "#########################################"
-#        echo "########## HTTP INSTALL      ############"
-#        echo "#########################################"
-#    fi
-
-
 
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
     --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$PUBLIC_ENDPOINT_PORT/$PUBLIC_ENDPOINT_VERSION \
