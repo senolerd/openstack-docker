@@ -42,7 +42,7 @@ function keystone_setup(){
 function populate_keystone(){
 #    PROTO="http"
     su -s /bin/sh -c "keystone-manage db_sync" keystone
-    cp /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
+    ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
 #    sed -i "s|Listen 5000|Listen 5000\nServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
 
 #    PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
