@@ -43,13 +43,16 @@ function populate_keystone(){
 
     if [ "$PUBLIC_ENDPOINT_TLS" == "true" ];
         then
-            PROTO=https
+            PROTO="https"
         else
             PROTO="http"
-            cp /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
-            sed -i "s|Listen 5000|Listen 5000\n ServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
+            echo "#########################################"
+            echo "########## HTTP INSTALL      ############"
+            echo "#########################################"
     fi
 
+    cp /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
+    sed -i "s|Listen 5000|Listen 5000\n ServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
 
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
     --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$PUBLIC_ENDPOINT_PORT/$PUBLIC_ENDPOINT_VERSION \
