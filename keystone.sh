@@ -46,6 +46,11 @@ function populate_keystone(){
         PROTO=https
       else
         PROTO=http
+        echo "############################################"
+        echo "############################################"
+        echo "########         PROTO=http           ######"
+        echo "############################################"
+        echo "############################################"
         ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
         sed -i "s|^Listen 5000|Listen 5000\n ServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
     fi
