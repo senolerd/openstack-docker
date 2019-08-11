@@ -2,16 +2,6 @@
 start=$(date +%s)
 DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-
     yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb
     yum install -y openstack-keystone
 #    yum install -y openstack-keystone python-openstackclient
@@ -54,10 +44,10 @@ function populate_keystone(){
     if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]
       then
         PROTO=https
-      else PROTO=http
+      else
+        PROTO=http
         ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
-    sed -i "s|^Listen 5000|Listen 5000\n ServerName $DOCKER_HOST_ADDR|g" /etc/keystone/keystone.conf
-
+        sed -i "s|^Listen 5000|Listen 5000\n ServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
     fi
 
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
