@@ -49,7 +49,7 @@ function populate_keystone(){
     fi
 
     ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
-    sed -i "s|^Listen 5000|Listen 5000\n ServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
+#    sed -i "s|Listen 5000|Listen 5000\n ServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
 
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
     --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$PUBLIC_ENDPOINT_PORT/$PUBLIC_ENDPOINT_VERSION \
