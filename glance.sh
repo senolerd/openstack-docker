@@ -1,19 +1,8 @@
 #!/bin/bash
 start=$(date +%s)
-DOCKER_HOST_ADDR=$(env $DOCKER_HOST |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
-
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
 
     yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb
-    yum install -y openstack-keystone python-openstackclient
+    yum install -y openstack-glance python-openstackclient
     yum clean all
     echo "# INFO: PACKAGE INSTALLING IS DONE #"
 
@@ -23,6 +12,36 @@ function create_keystone_db(){
     mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'localhost' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
     echo "# INFO: DB CREATING IS DONE #"
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function check_permissions(){
     chown -R root:keystone /etc/keystone
@@ -49,16 +68,9 @@ function keystone_setup(){
 
 function populate_keystone(){
     su -s /bin/sh -c "keystone-manage db_sync" keystone
-    PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
-
-    if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]
-      then PROTO=https
-      else PROTO=http
-    fi
-
-    keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
-    --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$PUBLIC_ENDPOINT_PORT/$PUBLIC_ENDPOINT_VERSION \
-    --bootstrap-internal-url http://$KEYSTONE_HOST:$INTERNAL_ENDPOINT_PORT/$INTERNAL_ENDPOINT_VERSION \
+    keystone-manage bootstrap --bootstrap-password adminpass \
+    --bootstrap-public-url $KEYSTONE_PUBLIC_ENDPOINT \
+    --bootstrap-internal-url $KEYSTONE_INTERNAL_ENDPOINT \
     --bootstrap-region-id $KEYSTONE_REGION
   }
 

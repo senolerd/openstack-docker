@@ -20,7 +20,6 @@ services:
       - 8.8.4.4
     env_file:
       - openstack.env
-
     secrets:
       - source: credential_0
         target: credential_0
