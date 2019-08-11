@@ -2,15 +2,15 @@
 start=$(date +%s)
 DOCKER_HOST_ADDR=$(env $DOCKER_HOST |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
-echo "####### DOCKER HOST: $DOCKER_HOST_ADDR ########### "
+echo "####### DOCKER HOST: $DOCKER_HOST ########### "
+echo "####### DOCKER HOST: $DOCKER_HOST ########### "
+echo "####### DOCKER HOST: $DOCKER_HOST ########### "
+echo "####### DOCKER HOST: $DOCKER_HOST ########### "
+echo "####### DOCKER HOST: $DOCKER_HOST ########### "
+echo "####### DOCKER HOST: $DOCKER_HOST ########### "
+echo "####### DOCKER HOST: $DOCKER_HOST ########### "
+echo "####### DOCKER HOST: $DOCKER_HOST ########### "
+echo "####### DOCKER HOST: $DOCKER_HOST ########### "
 
     yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb
     yum install -y openstack-keystone python-openstackclient
