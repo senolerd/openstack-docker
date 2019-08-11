@@ -56,10 +56,17 @@ function populate_keystone(){
       else PROTO=http
     fi
 
+    echo "########## KEYSTONE MANAGE START"
+    echo "########## KEYSTONE MANAGE START"
+
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
     --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$PUBLIC_ENDPOINT_PORT/$PUBLIC_ENDPOINT_VERSION \
     --bootstrap-internal-url http://$KEYSTONE_HOST:$INTERNAL_ENDPOINT_PORT/$INTERNAL_ENDPOINT_VERSION \
     --bootstrap-region-id $KEYSTONE_REGION
+    echo "########## KEYSTONE MANAGE START"
+    echo "########## KEYSTONE MANAGE START"
+
+
   }
 
 function install_first_node(){
