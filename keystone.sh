@@ -46,7 +46,7 @@ function populate_keystone(){
         PROTO=https
       else
         PROTO=http
-        ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
+        cp /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
     fi
 
 
