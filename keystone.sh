@@ -2,8 +2,8 @@
 start=$(date +%s)
 DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
-    yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb
-    yum install -y openstack-keystone mod_ssl
+    yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb > /dev/null
+    yum install -y openstack-keystone mod_ssl > /dev/null
 #    yum install -y openstack-keystone python-openstackclient
     yum clean all
     echo "# INFO: PACKAGE INSTALLING IS DONE #"
