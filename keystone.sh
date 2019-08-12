@@ -53,7 +53,7 @@ function keystone_setup(){
             echo "#########################################"
             echo "########## HTTPS INSTALL     ############"
             echo "#########################################"
-            sed -i "s|5000>|5000>\n SSLEngine on \n SSLCertificateFile /etc/keystone/10.0.0.71.crt \n SSLCertificateKeyFile /etc/keystone/10.0.0.71.key |g" /usr/share/keystone/wsgi-keystone.conf
+            sed -i "s|5000>|5000>\n    SSLEngine on \n    SSLCertificateFile /etc/keystone/10.0.0.71.crt \n    SSLCertificateKeyFile /etc/keystone/10.0.0.71.key\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
         else
             PROTO="http"
             echo "#########################################"
