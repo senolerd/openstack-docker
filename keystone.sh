@@ -41,9 +41,8 @@ function keystone_setup(){
 
     ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
 
-    sed -i "s|Listen 5000|Listen 5000\nServerName $KEYSTONE_HOST|g" /etc/httpd/conf.d/wsgi-keystone.conf
+    sed -i "s|Listen 5000|Listen 5000\nServerName $DOCKER_HOST|g" /etc/httpd/conf.d/wsgi-keystone.conf
 
-#10.0.0.71.crt  10.0.0.71.key
 
     PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
     if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]
@@ -66,7 +65,7 @@ function populate_keystone(){
 
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
     --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$PUBLIC_ENDPOINT_PORT/$PUBLIC_ENDPOINT_VERSION \
-    --bootstrap-internal-url http://$KEYSTONE_HOST:$INTERNAL_ENDPOINT_PORT/$INTERNAL_ENDPOINT_VERSION \
+    --bootstrap-internal-url $PROTO://$KEYSTONE_HOST:$INTERNAL_ENDPOINT_PORT/$INTERNAL_ENDPOINT_VERSION \
     --bootstrap-region-id $KEYSTONE_REGION
   }
 
