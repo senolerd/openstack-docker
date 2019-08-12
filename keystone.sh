@@ -6,20 +6,20 @@ DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'prin
     yum install -y openstack-keystone mod_ssl > /dev/null
 #    yum install -y openstack-keystone python-openstackclient
     yum clean all
-    echo "# INFO: PACKAGE INSTALLING IS DONE #"
+    echo "# INFO: Package installing is done. #"
 
 function create_keystone_db(){
     mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $KEYSTONE_DB_NAME;"
     mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'%' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
     mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'localhost' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
-    echo "# INFO: DB CREATING IS DONE #"
+    echo "# INFO: DB creating is done. #"
     }
 
 function check_permissions(){
     chown -R root:keystone /etc/keystone
     chmod 640 -R  /etc/keystone
     chmod 750 /etc/keystone
-    echo "# INFO: PERMISSIONS CHECK IS DONE #"
+    echo "# INFO: Permission check is done ? #"
     }
 
 function keystone_setup(){
@@ -40,7 +40,6 @@ function keystone_setup(){
     ln -s /run/secrets/10.0.0.71.key /etc/keystone/10.0.0.71.key
 
     ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
-
 
     sed -i "s|Listen 5000|Listen 5000\nServerName $KEYSTONE_HOST|g" /etc/httpd/conf.d/wsgi-keystone.conf
 
