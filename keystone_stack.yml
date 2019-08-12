@@ -47,6 +47,18 @@ services:
         gid: '163'
         mode: 0600
 
+      - source: 10.0.0.71.crt
+        target: 10.0.0.71.crt
+        uid: '163'
+        gid: '163'
+        mode: 0644
+
+      - source: 10.0.0.71.key
+        target: 10.0.0.71.key
+        uid: '163'
+        gid: '163'
+        mode: 0600
+
   db:
     image: mariadb:10.3.15
     restart: always
@@ -73,7 +85,7 @@ services:
     restart: always
     env_file:
      - openstack.env
-
+#
 
 # These are the initial fernet keys. Need to be saved as a docker secret with name as secret before starting the stack.
 # Keystoe's api servers will mount them as their fernet keys.
@@ -88,6 +100,7 @@ services:
 #
 # (the dash end of the command is included to command)
 
+
 secrets:
   credential_0:
     external: true
@@ -96,4 +109,8 @@ secrets:
   fernet_0:
     external: true
   fernet_1:
+    external: true
+  10.0.0.71.crt:
+    external: true
+  10.0.0.71.key:
     external: true

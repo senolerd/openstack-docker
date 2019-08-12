@@ -35,10 +35,16 @@ function keystone_setup(){
     ln -s /run/secrets/fernet_1 /etc/keystone/fernet-keys/1
     ln -s /run/secrets/credential_0 /etc/keystone/credential-keys/0
     ln -s /run/secrets/credential_1 /etc/keystone/credential-keys/1
+
+    ln -s /run/secrets/10.0.0.71.crt /etc/keystone/10.0.0.71.crt
+    ln -s /run/secrets/10.0.0.71.key /etc/keystone/10.0.0.71.key
+
     ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
 
 
     sed -i "s|Listen 5000|Listen 5000\nServerName $KEYSTONE_HOST|g" /etc/httpd/conf.d/wsgi-keystone.conf
+
+#10.0.0.71.crt  10.0.0.71.key
 
     PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
     if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]
@@ -47,6 +53,7 @@ function keystone_setup(){
             echo "#########################################"
             echo "########## HTTPS INSTALL     ############"
             echo "#########################################"
+            sed -i "s|5000>|5000>\n SSLEngine on \n SSLCertificateFile /etc/keystone/10.0.0.71.crt \n SSLCertificateKeyFile /etc/keystone/10.0.0.71.key |g" /usr/share/keystone/wsgi-keystone.conf
         else
             PROTO="http"
             echo "#########################################"
