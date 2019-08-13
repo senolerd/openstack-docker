@@ -7,8 +7,8 @@ echo "#########################################"
 start=$(date +%s)
 DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
-    yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb > /dev/null
-    yum install -y openstack-keystone mod_ssl > /dev/null
+    yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb
+    yum install -y openstack-keystone mod_ssl
     echo "# INFO: Package installing is done. #"
 
 function create_keystone_db(){
@@ -72,30 +72,86 @@ function keystone_setup(){
             tls_dir="/etc/keystone/tls"
             sed -i "s|5000>|$PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server.crt\n\tSSLCertificateKeyFile $tls_dir/server.key\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
 
+            # PoW CaCert and Key
             echo "
-            [req]
-            distinguished_name = req_distinguished_name
-            x509_extensions = v3_req
-            prompt = no
-            [req_distinguished_name]
-            C = US
-            ST = NY
-            L = New Dork City
-            O = Snake Oil Inc.
-            OU = Kelly's nook
-            CN = localhost
-            [v3_req]
-            keyUsage = keyEncipherment, dataEncipherment
-            extendedKeyUsage = serverAuth
+                -----BEGIN PRIVATE KEY-----
+                MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDF5vLSSvAZY/OD
+                bUsCCaSGqGm94eQWWYFUVqrzOBXKvS+QOBiZELqURG2kwjDpO1ZR+WvQkgiKSyLu
+                AtFTwPr8nkFUKT+9aU6M/LS6vRmkZoNEAJE+E6nrOCI7SOUweczwZiuCdRnDfah+
+                qObQ5FLlTdp99IsX+j1WfNErZ+GcMqQQojhGbPJqdA7KYHL6dS6jtQeDf0/O9nR4
+                G4WNhzU+efFxW2duAtkFT2Ur8fcGrPqjaU6QxAkCHxRrhLwxEBm9eMRE84pHDrZc
+                gEvPTKKcODD3o3hnJ9nSNoPxnwJisNJSv9dtLlpqXuICCmUXGoaz2kcoy3NbgBEk
+                D/wFpVIvAgMBAAECggEAXrHemM9wycVw3P9r98KjbiehyVEQcb1MTA3YaN76VnNm
+                Ee01n/BIRu/jQwYEn2VcLYdalod5/KptQVQp05iwwDX9bob6T+jWxFGbLQuU/Hxs
+                7RoUZY7FLJ9EifecazCs5o8M3LSpqkgzWr/5ChVmsQAqv0BHWibMONkqwUlIxBMC
+                EQZB2guDQ5x9CHx0SwKp52B2e5V0ezM1kuR8a9PBfy8YdxCPR+I/BCnkDvDY+VrS
+                NjKbUIvaFPypkr9ds4XpQLO041inSpczxm4PW83tuCoaHarhlVtJsoIsvXmQkedH
+                cKaZWefJe3G/KBk9nmRp7XYjZUq59+NUtnzBa8kQ0QKBgQD/yQUyjH3iNjlaTLLF
+                BI3ROk+PNtqK9E3iEFhmtmFhHgX7UGnn23Bv1lbeGJe8j+hBauXO2VzCS8O8Cbn+
+                IqEnb/Io6+//w+dzxOa6UbXFb5HCtW5/L2Wt4dgiAnmJcncBrx1/6gbI1bNiZNK/
+                n3C8q9BmQhgBmsJJ375UWZCMtwKBgQDGEXyOmgceYg+17YwjLUTnPHYZpJb9B7lC
+                jpqPv2HeY4k2xjrkzgfeVbtjoYVhp8aYtI1ACBDcNEG9ZvwFnmZ7lXaPiN9GAptA
+                r1c7tZjPjpCdj1ouSXVDOywPgHJMipMpd5NFnzYjLOKY7jRXqfNGTkbrGiFSwlbE
+                IBoLuE5eSQKBgDk+eM5OSOH2drFx1tRm54I6xZFsmk5czI1aUR5zlKmSeY47+ees
+                4aX11y0PXe4SWs1BKjs3xB2rrRuJJbntcBmOYSitXOHlqwfquiRaow6ToJBt4FPQ
+                fLYEhEVgPmj3WBDlavm0m14ZDXNo0w2VljpzTUmFYzAAvZig3UytWr9TAoGBALiS
+                LP75265ddQR0c4WINtBAkFE/BhCOdP3nw3I2xq2lFYV8Xf8/Wye9vlyOdKvW24ML
+                pSDJI2UAMU6dPDbEL/3z/sKsqlskLKavflu+0sJ/uJWKs1+0xlg7OMjNSjW3YIFg
+                01UqkxleR155gz85uOCIKyAEfo8PWCl1PLA1NJo5AoGAY3jq/SB/UFWIFaWoFuKc
+                LzQC6CkKEj7ptNVh2FR5ouuPDoqG2yq+97lyGYasfJE5I7aCYmrlhKx+c5CX+6ci
+                7/bXlqMu+dd/RrsBp+ivgSykXiHv3KQ9DAvDbnLCjcMog/KgkwZjNMS4zG0Xph6W
+                29kSzf64WlETjUvTeggwhvQ=
+                -----END PRIVATE KEY-----" > $tls_dir/server.key
+
+                echo "
+                -----BEGIN CERTIFICATE-----
+                MIIEATCCAumgAwIBAgIJANs2BMoeFmegMA0GCSqGSIb3DQEBCwUAMIGWMQswCQYD
+                VQQGEwJVUzELMAkGA1UECAwCTlkxDDAKBgNVBAcMA05ZQzEWMBQGA1UECgwNU25h
+                a2UgT2lsIENvLjEeMBwGA1UECwwVU25ha2UgT2lsIENsb3VkIERlcHQuMRIwEAYD
+                VQQDDAlsb2NhbGhvc3QxIDAeBgkqhkiG9w0BCQEWEXJvb3RAc25ha2VvaWwuY29t
+                MB4XDTE5MDgxMzIxNTM0NFoXDTIwMDgxMjIxNTM0NFowgZYxCzAJBgNVBAYTAlVT
+                MQswCQYDVQQIDAJOWTEMMAoGA1UEBwwDTllDMRYwFAYDVQQKDA1TbmFrZSBPaWwg
+                Q28uMR4wHAYDVQQLDBVTbmFrZSBPaWwgQ2xvdWQgRGVwdC4xEjAQBgNVBAMMCWxv
+                Y2FsaG9zdDEgMB4GCSqGSIb3DQEJARYRcm9vdEBzbmFrZW9pbC5jb20wggEiMA0G
+                CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDF5vLSSvAZY/ODbUsCCaSGqGm94eQW
+                WYFUVqrzOBXKvS+QOBiZELqURG2kwjDpO1ZR+WvQkgiKSyLuAtFTwPr8nkFUKT+9
+                aU6M/LS6vRmkZoNEAJE+E6nrOCI7SOUweczwZiuCdRnDfah+qObQ5FLlTdp99IsX
+                +j1WfNErZ+GcMqQQojhGbPJqdA7KYHL6dS6jtQeDf0/O9nR4G4WNhzU+efFxW2du
+                AtkFT2Ur8fcGrPqjaU6QxAkCHxRrhLwxEBm9eMRE84pHDrZcgEvPTKKcODD3o3hn
+                J9nSNoPxnwJisNJSv9dtLlpqXuICCmUXGoaz2kcoy3NbgBEkD/wFpVIvAgMBAAGj
+                UDBOMB0GA1UdDgQWBBQ61yc0sehWXLBrC2pjNsncultQSzAfBgNVHSMEGDAWgBQ6
+                1yc0sehWXLBrC2pjNsncultQSzAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBCwUA
+                A4IBAQA1cCpCbRguYmyz5lRlGefRp0ymUvU9ne+84Ezuv7MiuT16W7jmHktJykQR
+                sLrvkxGWVv+tvIhCZdJvWmTc/BWHNEWMfCmTY8azHBjx+pGawSg6xr3zLAd3ioDY
+                NUHjg4k8M2LfcmZdAL0QpALe29yFfj9C3fBIf6ONGBJWfWjL7s/Rs3wHyffOr7Iq
+                Jlb69csSZHyiecz4Hvk7Nh3GhOaNNAgzpnZzx2IOHSZlqjvYx98b5Q30bQp14Nzm
+                Y8G+falGftFT4dUavRvvXvbTJQ9/3cl4B8jEw418mSSW/J8Za5xD/I7srIKc+m1k
+                eVofIIhh2eqUZ2MaUdVn2LCiYjEq
+                -----END CERTIFICATE-----" > $tls_dir/server.crt
+
+#            echo "
+#            [req]
+#            distinguished_name = req_distinguished_name
+#            x509_extensions = v3_req
+#            prompt = no
+#            [req_distinguished_name]
+#            C = US
+#            ST = NY
+#            L = New Dork City
+#            O = Snake Oil Inc.
+#            OU = Kelly's nook
+#            CN = localhost
+#            [v3_req]
+#            keyUsage = keyEncipherment, dataEncipherment
+#            extendedKeyUsage = serverAuth
 #            subjectAltName = @alt_names
 #
 #            [alt_names]
 #            IP.1 = 10.0.0.71
 #            IP.2 = 10.0.0.72
 #            IP.3 = 10.0.0.73
-            " > $tls_dir/os.cnf
-
-            openssl req -x509 -nodes -days 365 -newkey rsa:2048 -config $tls_dir/os.cnf -keyout $tls_dir/server.key -out $tls_dir/server.crt
+#            " > $tls_dir/os.cnf
+#            openssl req -x509 -nodes -days 365 -newkey rsa:2048 -config $tls_dir/os.cnf -keyout $tls_dir/server.key -out $tls_dir/server.crt
 
         else
             PROTO="http"
