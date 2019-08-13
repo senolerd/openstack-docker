@@ -22,29 +22,22 @@ function create_keystone_db(){
     }
 
 function check_permissions(){
+# https://docs.openstack.org/security-guide/identity/checklist.html
 
-    chown -R root:keystone /etc/keystone
-    chmod 0750 /etc/keystone
+    chown -R keystone:keystone /etc/keystone
 
-    chmod -R 0640 /etc/keystone
-    chmod -R 0640 /etc/keystone/tls
+    echo "INFO: All directories to be set 7500"
+    for directory in $(find /etc/keystone/ -type d) ; do
+      chmod 0750 $directory
+      echo $directory permission: $(stat -L -c "%a" $directory), Ownership: $(stat -L -c "%U %G" $directory | egrep "keystone keystone")
+      done
 
-    echo "--------------------------"
-    echo "ls -al /etc/|grep keystone"
-    ls -al /etc/|grep keystone
-
-    echo "--------------------------"
-    echo "ls -al /etc/tls|grep tls"
-    ls -al /etc/|grep keystone
-
-    echo "--------------------------"
-    echo "ls -al /etc/keystone"
-    ls -al /etc/keystone
-
-    echo "--------------------------"
-    echo "ls -al /etc/keystone/tls"
-    ls -al /etc/keystone/tls
-
+    echo "INFO: All files to be set 640"
+    for file in $(find /etc/keystone/ -type f) ;
+      do
+        chmod 0640 $file
+        echo $file permission: $(stat -L -c "%a" $file), Ownership: $(stat -L -c "%U %G" $file | egrep "keystone keystone")
+      done
 
     echo "# INFO: Permission check is done ? #"
     }
