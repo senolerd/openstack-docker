@@ -51,8 +51,8 @@ function keystone_setup(){
             echo "#########################################"
 
             PROTO="https"
-            tls_dir="/etc/keystone/tls"
             mkdir /etc/keystone/tls
+            tls_dir="/etc/keystone/tls"
             sed -i "s|5000>|$PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server.crt\n\tSSLCertificateKeyFile $tls_dir/server.crt\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
 
             echo "
@@ -84,7 +84,6 @@ function keystone_setup(){
             echo "####### cat  $tls_dir/os.cnf #######"
             cat $tls_dir/os.cnf
 
-            check_permissions
 
 
         else
@@ -122,9 +121,11 @@ function main(){
                 if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' 2> /dev/null ; then
                   echo "# INFO: Installing additional api node."
                   add_new_node
+
                 else
                   echo "# INFO: Installing new api node node ."
                   install_first_node
+
                 fi
                 break
           else
@@ -133,6 +134,8 @@ function main(){
           fi
         done
     end=$(date +%s)
+
+    check_permissions
     echo "# INFO: $OS_VERSION installing report: (started: $start, ended: $end, took $(expr $end - $start) secs )"
     httpd -DFOREGROUND
     }
