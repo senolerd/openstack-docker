@@ -32,6 +32,8 @@ function check_permissions(){
 
     chmod 640 -R /etc/keystone
     chmod 750 /etc/keystone
+
+    chmod 600 /etc/keystone/tls
     echo "# INFO: Permission check is done ? #"
     }
 
@@ -149,7 +151,15 @@ function main(){
 
     check_permissions
     echo "# INFO: $OS_VERSION installing report: (started: $start, ended: $end, took $(expr $end - $start) secs )"
+
     httpd -DFOREGROUND
+    echo "------------------------------------"
+    cat /var/log/keystone/*
+
+    echo "------------------------------------"
+    cat /var/log/httpd/*
+
+
     }
 
 main
