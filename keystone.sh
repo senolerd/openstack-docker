@@ -89,10 +89,10 @@ function keystone_setup(){
             extendedKeyUsage = serverAuth
             subjectAltName = @alt_names
 
-            [alt_names]
-            IP.1 = 10.0.0.71
-            IP.2 = 10.0.0.72
-            IP.3 = 10.0.0.73
+#            [alt_names]
+#            IP.1 = 10.0.0.71
+#            IP.2 = 10.0.0.72
+#            IP.3 = 10.0.0.73
             " > $tls_dir/os.cnf
 
             openssl req -x509 -nodes -days 365 -newkey rsa:2048 -config $tls_dir/os.cnf -keyout $tls_dir/server.key -out $tls_dir/server.crt
