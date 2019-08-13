@@ -1,17 +1,14 @@
 #!/bin/bash
+start=$(date +%s)
 echo "#########################################"
-echo "#######    INSTALLING STARTED     #######"
+echo "#######    INSTALLING STARTED $start"
 echo "#########################################"
-
-
 
 start=$(date +%s)
 DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
     yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb > /dev/null
     yum install -y openstack-keystone mod_ssl > /dev/null
-#    yum install -y openstack-keystone python-openstackclient
-    yum clean all
     echo "# INFO: Package installing is done. #"
 
 function create_keystone_db(){
@@ -26,7 +23,7 @@ function check_permissions(){
 
     chown -R keystone:keystone /etc/keystone
 
-    echo "INFO: All directories to be set 7500"
+    echo "INFO: All directories to be set 750"
     for directory in $(find /etc/keystone/ -type d) ; do
       chmod 0750 $directory
       echo $directory permission: $(stat -L -c "%a" $directory), Ownership: $(stat -L -c "%U %G" $directory | egrep "keystone keystone")
@@ -86,7 +83,7 @@ function keystone_setup(){
             L = New Dork City
             O = Snake Oil Inc.
             OU = Kelly's nook
-            CN = 10.0.0.71
+            CN = localhost
             [v3_req]
             keyUsage = keyEncipherment, dataEncipherment
             extendedKeyUsage = serverAuth
@@ -99,12 +96,6 @@ function keystone_setup(){
             " > $tls_dir/os.cnf
 
             openssl req -x509 -nodes -days 365 -newkey rsa:2048 -config $tls_dir/os.cnf -keyout $tls_dir/server.key -out $tls_dir/server.crt
-            echo "####### ls $tls_dir #######"
-            ls -al $tls_dir
-            echo "####### cat  $tls_dir/os.cnf #######"
-            cat $tls_dir/os.cnf
-
-
 
         else
             PROTO="http"
@@ -156,13 +147,7 @@ function main(){
 
     check_permissions
     echo "# INFO: $OS_VERSION installing report: (started: $start, ended: $end, took $(expr $end - $start) secs )"
-
     httpd -DFOREGROUND
-    echo "------------------------------------"
-    cat /var/log/keystone/*
-
-    echo "------------------------------------"
-    cat /var/log/httpd/*
 
 
     }
