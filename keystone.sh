@@ -1,4 +1,10 @@
 #!/bin/bash
+echo "#########################################"
+echo "#######    INSTALLING STARTED     #######"
+echo "#########################################"
+
+
+
 start=$(date +%s)
 DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
@@ -68,7 +74,7 @@ function keystone_setup(){
             PROTO="https"
             mkdir /etc/keystone/tls
             tls_dir="/etc/keystone/tls"
-            sed -i "s|5000>|$PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server.crt\n\tSSLCertificateKeyFile $tls_dir/server.crt\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
+            sed -i "s|5000>|$PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server.crt\n\tSSLCertificateKeyFile $tls_dir/server.key\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
 
             echo "
             [req]
