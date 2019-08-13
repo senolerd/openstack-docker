@@ -34,12 +34,10 @@ function check_permissions(){
     echo "ls -al /etc/keystone/tls"
     ls -al /etc/keystone/tls
 
-
-
     chmod 0640 -R /etc/keystone
     chmod 0750 /etc/keystone
 
-    chmod -R 0640 /etc/keystone/tls/*
+    chmod 0640 -R /etc/keystone/tls
     echo "# INFO: Permission check is done ? #"
     }
 
