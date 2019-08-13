@@ -36,10 +36,10 @@ function check_permissions(){
 
 
 
-    chmod 640 -R /etc/keystone
-    chmod 750 /etc/keystone
+    chmod 0640 -R /etc/keystone
+    chmod 0750 /etc/keystone
 
-    chmod 640 /etc/keystone/tls
+    chmod -R 0640 /etc/keystone/tls
     echo "# INFO: Permission check is done ? #"
     }
 
