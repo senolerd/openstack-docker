@@ -87,8 +87,8 @@ function keystone_setup(){
             [v3_req]
             keyUsage = keyEncipherment, dataEncipherment
             extendedKeyUsage = serverAuth
-            subjectAltName = @alt_names
-
+#            subjectAltName = @alt_names
+#
 #            [alt_names]
 #            IP.1 = 10.0.0.71
 #            IP.2 = 10.0.0.72
