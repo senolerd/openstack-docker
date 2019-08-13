@@ -22,8 +22,19 @@ function create_keystone_db(){
     }
 
 function check_permissions(){
+
     chown -R root:keystone /etc/keystone
+    chmod 0750 /etc/keystone
+
+    chmod -R 0640 /etc/keystone
+    chmod -R 0640 /etc/keystone/tls
+
+    echo "--------------------------"
     echo "ls -al /etc/|grep keystone"
+    ls -al /etc/|grep keystone
+
+    echo "--------------------------"
+    echo "ls -al /etc/tls|grep tls"
     ls -al /etc/|grep keystone
 
     echo "--------------------------"
@@ -34,10 +45,7 @@ function check_permissions(){
     echo "ls -al /etc/keystone/tls"
     ls -al /etc/keystone/tls
 
-    chmod -R 0640 /etc/keystone
-    chmod 0750 /etc/keystone
 
-    chmod -R 0640 /etc/keystone/tls
     echo "# INFO: Permission check is done ? #"
     }
 
