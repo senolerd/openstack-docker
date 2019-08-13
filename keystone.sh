@@ -36,8 +36,8 @@ function keystone_setup(){
     ln -s /run/secrets/credential_0 /etc/keystone/credential-keys/0
     ln -s /run/secrets/credential_1 /etc/keystone/credential-keys/1
 
-    ln -s /run/secrets/10.0.0.71.crt /etc/keystone/10.0.0.71.crt
-    ln -s /run/secrets/10.0.0.71.key /etc/keystone/10.0.0.71.key
+#    ln -s /run/secrets/10.0.0.71.crt /etc/keystone/10.0.0.71.crt
+#    ln -s /run/secrets/10.0.0.71.key /etc/keystone/10.0.0.71.key
 
     ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
 
@@ -47,11 +47,40 @@ function keystone_setup(){
     PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
     if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]
         then
-            PROTO="https"
             echo "#########################################"
             echo "########## HTTPS INSTALL     ############"
             echo "#########################################"
-            sed -i "s|5000>|5000>\n    SSLEngine on \n    SSLCertificateFile /etc/keystone/10.0.0.71.crt \n    SSLCertificateKeyFile /etc/keystone/10.0.0.71.key\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
+
+            PROTO="https"
+            tls_dir="/etc/keystone/tls"
+            mkdir /etc/keystone/tls
+            sed -i "s|5000>|$PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server.crt\n\tSSLCertificateKeyFile $tls_dir/server.crt\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
+
+            echo "
+            [req]
+            distinguished_name = req_distinguished_name
+            x509_extensions = v3_req
+            prompt = no
+            [req_distinguished_name]
+            C = US
+            ST = NY
+            L = New Dork City
+            O = Snake Oil Inc.
+            OU = Kelly's nook
+            CN = 10.0.0.71
+            [v3_req]
+            keyUsage = keyEncipherment, dataEncipherment
+            extendedKeyUsage = serverAuth
+            subjectAltName = @alt_names
+
+            [alt_names]
+            IP.1 = 10.0.0.71
+            IP.2 = 10.0.0.72
+            IP.3 = 10.0.0.73
+            " > $tls_dir/os.cnf
+
+            openssl req -x509 -nodes -days 365 -newkey rsa:2048 -config $tls_dir/os.cnf -keyout $tls_dir/server.key -out $tls_dir/server.crt
+
         else
             PROTO="http"
             echo "#########################################"
