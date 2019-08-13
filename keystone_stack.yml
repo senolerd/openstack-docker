@@ -12,7 +12,7 @@ services:
       replicas: 3
 #      placement:
 #        constraints: [ node.labels.type == static ]
-    restart: always
+#    restart: always
     ports:
       - 5000:5000
     dns:
@@ -61,7 +61,7 @@ services:
 
   db:
     image: mariadb:10.3.15
-    restart: always
+#    restart: always
     ports:
       - 3306:3306
     dns:
@@ -72,17 +72,17 @@ services:
 
   adminer:
     image: adminer
-    restart: always
+#    restart: always
     ports:
       - 8080:8080
 
   memcached:
     image: memcached:alpine
-    restart: always
+#    restart: always
 
   rabbitmq:
     image: rabbitmq:3.7.17-rc.1-alpine
-    restart: always
+#    restart: always
     env_file:
      - openstack.env
 #
