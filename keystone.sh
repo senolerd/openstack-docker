@@ -17,7 +17,20 @@ function create_keystone_db(){
 
 function check_permissions(){
     chown -R root:keystone /etc/keystone
-    chmod 640 -R  /etc/keystone
+    echo "ls -al /etc/|grep keystone"
+    ls -al /etc/|grep keystone
+
+    echo "--------------------------"
+    echo "ls -al /etc/keystone"
+    ls -al /etc/keystone
+
+    echo "--------------------------"
+    echo "ls -al /etc/keystone/tls"
+    ls -al /etc/keystone/tls
+
+
+
+    chmod 640 -R /etc/keystone
     chmod 750 /etc/keystone
     echo "# INFO: Permission check is done ? #"
     }
@@ -125,7 +138,6 @@ function main(){
                 else
                   echo "# INFO: Installing new api node node ."
                   install_first_node
-
                 fi
                 break
           else
