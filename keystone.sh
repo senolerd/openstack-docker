@@ -80,6 +80,11 @@ function keystone_setup(){
             " > $tls_dir/os.cnf
 
             openssl req -x509 -nodes -days 365 -newkey rsa:2048 -config $tls_dir/os.cnf -keyout $tls_dir/server.key -out $tls_dir/server.crt
+            echo "####### ls $tls_dir #######"
+            ls $tls_dir
+            echo "####### cat  $tls_dir/os.cnf #######"
+            cat $tls_dir/os.cnf
+
 
         else
             PROTO="http"
