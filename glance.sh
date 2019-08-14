@@ -108,7 +108,7 @@ function glance_setup(){
             fi
         done
     # Openstack alias
-    openstack="openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+    alias openstack="openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
               --os-identity-api-version 3 --os-token='$token' $CERT_CHK "
 
     # openstack project create --domain default --description "Service Project" service
