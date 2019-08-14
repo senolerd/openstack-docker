@@ -1,5 +1,5 @@
 #!/bin/bash
-start=$(date +%s)
+started=$(date +%s)
 DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
     yum install -y centos-release-openstack-$OS_VERSION  httpd mod_wsgi mariadb
@@ -43,13 +43,16 @@ function check_permissions(){
 
 # GLANCE SETUP
 function glance_setup(){
+    INSECURE=$(echo "$INSECURE" | tr '[:upper:]' '[:lower:]')
+    if [ "$INSECURE" == "true" ] ; then CERT_CHK=" --insecure ";fi
+
     KEYSTONE_INTERNAL_ENDPOINT_TLS=$(echo "$KEYSTONE_INTERNAL_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
     if [ "$KEYSTONE_INTERNAL_ENDPOINT_TLS" == "true" ]
       then KEYSTONE_PROTO="https"
       else KEYSTONE_PROTO="http"
     fi
-    echo "#### REMOVE ME: GLANCE KEYSTONE INTERNAL PROTO: $KEYSTONE_PROTO "
 
+    echo "#### REMOVE ME: GLANCE KEYSTONE INTERNAL PROTO: $KEYSTONE_PROTO "
 
     GLANCE_PUBLIC_ENDPOINT_TLS=$(echo "$GLANCE_PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
     GLANCE_INTERNAL_ENDPOINT_TLS=$(echo "$GLANCE_INTERNAL_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
@@ -85,7 +88,7 @@ function glance_setup(){
 
 ###############################################################################
 ###############################################################################
-    # Take Token
+    # Try to take a token until it's sent
     while true
         do
             if token=$(openstack token issue \
@@ -95,73 +98,59 @@ function glance_setup(){
                     --os-project-name admin \
                     --os-project-domain-id default \
                     --os-auth-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-                    --os-identity-api-version 3 --insecure -f value|grep gAAA)
+                    --os-identity-api-version 3 $CERT_CHK -f value|grep gAAA)
               then
-#                token=$(openstack token issue \
-#                    --os-username admin \
-#                    --os-password $ADMIN_PASS \
-#                    --os-user-domain-id default \
-#                    --os-project-name admin \
-#                    --os-project-domain-id default \
-#                    --os-auth-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-#                    --os-identity-api-version 3 --insecure -f value |grep gAAA)
-
-                echo "##### TOKEN GELMIS OLMALI:  $token ####"
+                echo "##### Remove Me: TOKEN:  $token ####"
                 break
               else
                 echo "INFO [Glance]: Waiting to identity server [`date`]"
-                sleep 3
+                sleep 5
             fi
         done
-
+    # Openstack alias
+    openstack="openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+              --os-identity-api-version 3 --os-token='$token' $CERT_CHK "
 
     # openstack project create --domain default --description "Service Project" service
     echo "INFO [Glance]: CHECK SERVICE PROJECT IN CASE"
-    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-              --os-identity-api-version 3 \
-              --os-token="$token" --insecure \
-              project create --domain default --description "Service Project" service
+
+    if openstack project show service --domain default;
+      then openstack "'service' project is exist"
+      else project create --domain default --description "Service Project" service
+    fi
+
 
     # Create service user
-    echo "INFO [Glance]: Create service user $GLANCE_SERVICE_USERNAME "
-    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-              --os-identity-api-version 3 \
-              --os-token="$token" --insecure \
-              user create --domain default --password $GLANCE_SERVICE_USER_PASS $GLANCE_SERVICE_USERNAME
+    echo "INFO [Glance]: Create service user glance user name"
+    if openstack user show $GLANCE_SERVICE_USERNAME
+      then "$GLANCE_SERVICE_USERNAME is exist"
+      else openstack user create --domain default --password $GLANCE_SERVICE_USER_PASS $GLANCE_SERVICE_USERNAME
+    fi
 
     # Admin role for Glance user in "service" project
-    echo "INFO [Glance]: Admin role for Glance user in \"service\" project "
-    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-              --os-identity-api-version 3 \
-              --os-token"$token" --insecure \
-              role add --project service --user $GLANCE_SERVICE_USERNAME admin
+    echo "INFO [Glance]: Admin role for Glance user in 'service' project "
+    openstack role add --project service --user $GLANCE_SERVICE_USERNAME admin
 
     # Glance service creation
     echo "INFO [Glance]: Glance service creation"
-    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-              --os-identity-api-version 3 \
-              --os-token="$token" --insecure \
-              service create --name glance --description "OpenStack Image" image
+    if openstack service show glance
+      then "'glance' service exist."
+      else openstack service create --name glance --description "OpenStack Image" image
+    fi
 
-    # Glance endpoints
+
+    # Glance endpoints (probably only public is going to be fine soon)
     echo "INFO [Glance]: Glance endpoint creation [admin]"
-    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-              --os-identity-api-version 3 \
-              --os-token="$token" --insecure \
-              endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$KEYSTONE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT
+    openstack endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$KEYSTONE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT
 
     echo "INFO [Glance]: Glance endpoint creation [internal]"
-    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-              --os-identity-api-version 3 \
-              --os-token="$token" --insecure \
-              endpoint create --region RegionOne image internal $GLANCE_INT_PROTO://$KEYSTONE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT
+    openstack endpoint create --region RegionOne image internal $GLANCE_INT_PROTO://$KEYSTONE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT
 
     echo "INFO [Glance]: Glance endpoint creation [public]"
-    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-              --os-identity-api-version 3 \
-              --os-token="$token" --insecure \
-              endpoint create --region RegionOne image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT
+    openstack endpoint create --region RegionOne image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT
 
+    # Token revoke
+    openstack token revoke "$token"
 }
 
 # SET CONFIG FILES
@@ -252,7 +241,7 @@ function main(){
           fi
         done
     end=$(date +%s)
-    echo "# INFO: $OS_VERSION installing report: (started: $start, ended: $end, took $(expr $end - $start) secs )"
+    echo "# INFO: $OS_VERSION installing report: (started: $started, ended: $end, took $(expr $end - $start) secs )"
     httpd -DFOREGROUND
     }
 
