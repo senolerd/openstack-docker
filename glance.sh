@@ -95,7 +95,7 @@ function check_permissions(){
                     --os-project-name admin \
                     --os-project-domain-id default \
                     --os-auth-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-                    --os-identity-api-version 3
+                    --os-identity-api-version 3 --insecure
               then
                 token=$(openstack token issue \
                     --os-username admin \

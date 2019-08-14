@@ -22,14 +22,14 @@ function check_permissions(){
 # https://docs.openstack.org/security-guide/identity/checklist.html
 
     chown -R keystone:keystone /etc/keystone
-
-    echo "\nINFO: All directories to be set 750"
+    echo "# Permission Check Report #"
+    echo "INFO: All directories to be set 750"
     for directory in $(find /etc/keystone/ -type d) ; do
         chmod 0750 $directory
         echo $(stat -L -c "%a" $directory), Ownership: $(stat -L -c "%U %G" $directory | egrep "keystone keystone") " :: $directory"
       done
 
-    echo "\nINFO: All files to be set 640"
+    echo "INFO: All files to be set 640"
     for file in $(find /etc/keystone/ -type f) ; do
         chmod 0640 $file
         echo $(stat -L -c "%a" $file), Ownership: $(stat -L -c "%U %G" $file | egrep "keystone keystone") " :: $file "
