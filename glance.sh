@@ -115,7 +115,7 @@ function glance_setup(){
     echo "INFO [Glance]: CHECK SERVICE PROJECT IN CASE"
 
     if openstack project show service --domain default;
-      then openstack "'service' project is exist"
+      then echo "'service' project is exist"
       else project create --domain default --description "Service Project" service
     fi
 
@@ -134,7 +134,7 @@ function glance_setup(){
     # Glance service creation
     echo "INFO [Glance]: Glance service creation"
     if openstack service show glance
-      then "'glance' service exist."
+      then echo "'glance' service exist."
       else openstack service create --name glance --description "OpenStack Image" image
     fi
 
