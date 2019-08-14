@@ -88,23 +88,23 @@ function glance_setup(){
     # Take Token
     while true
         do
-            if openstack token issue \
+            if token=$(openstack token issue \
                     --os-username admin \
                     --os-password $ADMIN_PASS \
                     --os-user-domain-id default \
                     --os-project-name admin \
                     --os-project-domain-id default \
                     --os-auth-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-                    --os-identity-api-version 3 --insecure
+                    --os-identity-api-version 3 --insecure -f value|grep gAAA)
               then
-                token=$(openstack token issue \
-                    --os-username admin \
-                    --os-password $ADMIN_PASS \
-                    --os-user-domain-id default \
-                    --os-project-name admin \
-                    --os-project-domain-id default \
-                    --os-auth-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-                    --os-identity-api-version 3 --insecure -f value |head -2)
+#                token=$(openstack token issue \
+#                    --os-username admin \
+#                    --os-password $ADMIN_PASS \
+#                    --os-user-domain-id default \
+#                    --os-project-name admin \
+#                    --os-project-domain-id default \
+#                    --os-auth-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+#                    --os-identity-api-version 3 --insecure -f value |grep gAAA)
 
                 echo "##### TOKEN GELMIS OLMALI:  $token ####"
                 break
