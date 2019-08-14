@@ -119,51 +119,48 @@ function check_permissions(){
     echo "INFO [Glance]: CHECK SERVICE PROJECT IN CASE"
     openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
               --os-identity-api-version 3 \
-              --os-token $token --insecure \
+              --os-token="$token" --insecure \
               project create --domain default --description "Service Project" service
 
     # Create service user
     echo "INFO [Glance]: Create service user $GLANCE_SERVICE_USERNAME "
     openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
               --os-identity-api-version 3 \
-              --os-token $token --insecure \
+              --os-token="$token" --insecure \
               user create --domain default --password $GLANCE_SERVICE_USER_PASS $GLANCE_SERVICE_USERNAME
 
     # Admin role for Glance user in "service" project
     echo "INFO [Glance]: Admin role for Glance user in \"service\" project "
     openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
               --os-identity-api-version 3 \
-              --os-token $token --insecure \
+              --os-token"$token" --insecure \
               role add --project service --user $GLANCE_SERVICE_USERNAME admin
 
     # Glance service creation
     echo "INFO [Glance]: Glance service creation"
     openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
               --os-identity-api-version 3 \
-              --os-token $token --insecure \
+              --os-token="$token" --insecure \
               service create --name glance --description "OpenStack Image" image
 
     # Glance endpoints
     echo "INFO [Glance]: Glance endpoint creation [admin]"
     openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
               --os-identity-api-version 3 \
-              --os-token $token --insecure \
+              --os-token="$token" --insecure \
               endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$KEYSTONE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT
 
     echo "INFO [Glance]: Glance endpoint creation [internal]"
     openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
               --os-identity-api-version 3 \
-              --os-token $token --insecure \
+              --os-token="$token" --insecure \
               endpoint create --region RegionOne image internal $GLANCE_INT_PROTO://$KEYSTONE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT
 
     echo "INFO [Glance]: Glance endpoint creation [public]"
     openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
               --os-identity-api-version 3 \
-              --os-token $token --insecure \
+              --os-token="$token" --insecure \
               endpoint create --region RegionOne image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT
-
-
-
 
 
 # SET CONFIG FILES
@@ -173,13 +170,6 @@ function check_permissions(){
 # MAIN
 
 sleep 111d
-
-
-
-
-
-
-
 
 
 
