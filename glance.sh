@@ -13,11 +13,22 @@ fi
     echo "# INFO: GLANCE package installing done. #"
 
 function create_db(){
-    mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $GLANCE_DB_NAME;"
-    mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $GLANCE_DB_NAME.* TO '$GLANCE_DB_USER'@'%' IDENTIFIED BY '$GLANCE_USER_DB_PASS';"
-    mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $GLANCE_DB_NAME.* TO '$GLANCE_DB_USER'@'localhost' IDENTIFIED BY '$GLANCE_USER_DB_PASS';"
-    echo "# INFO: GLANCE DB  Creating is done #"
-    }
+
+    while true
+      do
+        if mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "use $GLANCE_DB_NAME;" ;
+          then
+            echo "INFO: GLANCE DB exist, heading to server configuration."
+          else
+            mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $GLANCE_DB_NAME;"
+            mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $GLANCE_DB_NAME.* TO '$GLANCE_DB_USER'@'%' IDENTIFIED BY '$GLANCE_USER_DB_PASS';"
+            mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $GLANCE_DB_NAME.* TO '$GLANCE_DB_USER'@'localhost' IDENTIFIED BY '$GLANCE_USER_DB_PASS';"
+            su -s /bin/sh -c "glance-manage db_sync" glance
+            echo "# INFO: GLANCE DB creating and populating is done. #"
+        fi
+      done
+
+   }
 
 ###############################################################################
 ###############################################################################
@@ -44,9 +55,6 @@ function check_permissions(){
     }
 
 
-###############################################################################
-###############################################################################
-
 # GLANCE SETUP
 function glance_api_setup(){
     INSECURE=$(echo "$INSECURE" | tr '[:upper:]' '[:lower:]')
@@ -59,35 +67,27 @@ function glance_api_setup(){
     GLANCE_ADMIN_ENDPOINT_TLS=$(echo "$GLANCE_ADMIN_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
 
     if [ "$GLANCE_PUBLIC_ENDPOINT_TLS" == "true" ]
-        then
-            echo "########## GLANCE PUBLIC HTTPS INSTALL ##"
-            GLANCE_PUB_PROTO="https"
-        else
-            GLANCE_PUB_PROTO="http"
-            echo "########## GLANCE PUBLIC HTTP INSTALL ###"
+        then echo "########## GLANCE PUBLIC HTTPS INSTALL ##"
+             GLANCE_PUB_PROTO="https"
+        else GLANCE_PUB_PROTO="http"
+             echo "########## GLANCE PUBLIC HTTP INSTALL ###"
     fi
 
     if [ "$GLANCE_INTERNAL_ENDPOINT_TLS" == "true" ]
-        then
-            echo "########## GLANCE INTERNAL HTTPS INSTALL ##"
-            GLANCE_INT_PROTO="https"
-        else
-            GLANCE_INT_PROTO="http"
-            echo "########## GLANCE INTERNAL HTTP INSTALL ###"
+        then echo "########## GLANCE INTERNAL HTTPS INSTALL ##"
+             GLANCE_INT_PROTO="https"
+        else GLANCE_INT_PROTO="http"
+             echo "########## GLANCE INTERNAL HTTP INSTALL ###"
     fi
 
 
     if [ "$GLANCE_ADMIN_ENDPOINT_TLS" == "true" ]
-        then
-            echo "########## GLANCE ADMIN HTTPS INSTALL ##"
-            GLANCE_ADM_PROTO="https"
-        else
-            GLANCE_ADM_PROTO="http"
-            echo "########## GLANCE ADMIN HTTP INSTALL ###"
+        then echo "########## GLANCE ADMIN HTTPS INSTALL ##"
+             GLANCE_ADM_PROTO="https"
+        else GLANCE_ADM_PROTO="http"
+             echo "########## GLANCE ADMIN HTTP INSTALL ###"
     fi
 
-###############################################################################
-###############################################################################
     # Try to take a token until it's sent
     while true
         do
@@ -156,7 +156,6 @@ function glance_api_setup(){
 
 # SET CONFIG FILES
 function server_configuration(){
-    # DB Connection
 
     keystone_authtoken="\
     \n[keystone_authtoken] \
@@ -170,19 +169,21 @@ function server_configuration(){
     \nusername = $GLANCE_SERVICE_USERNAME \
     \npassword = $GLANCE_SERVICE_USER_PASS \
     "
-
+    glance_store="\
+    n\[glance_store] \
+    n\stores = file,http \
+    n\default_store = file \
+    n\filesystem_store_datadir = /var/lib/glance/images/ \
+    "
 
     for conf_file in /etc/glance/glance-api.conf /etc/glance/glance-registry.conf ;
       do
         sed -i "s|^\[database]|[database]\nconnection = mysql+pymysql://$GLANCE_DB_USER:$GLANCE_USER_DB_PASS@$MYSQL_HOST/$GLANCE_DB_NAME|g" $conf_file
         sed -i "s|^\[keystone_authtoken]|$keystone_authtoken|g" $conf_file
+        sed -i "s|^\[paste_deploy]|[paste_deploy]\nflavor = keystone\n|g" $conf_file
       done
 
-#    sed -i "s|^\[database]|[database]\nconnection = mysql+pymysql://$KEYSTONE_DB_USER:$KEYSTONE_USER_DB_PASS@$MYSQL_HOST/$KEYSTONE_DB_NAME|g" /etc/keystone/keystone.conf
-#    sed -i "s|^\[token]|[token]\nprovider = fernet\ncaching = true|g" /etc/keystone/keystone.conf
-#    sed -i "s|^\[cache]|[cache]\nenable = true \nbackend = dogpile.cache.memcached \nbackend_argument = url:$MEMCACHED_HOST:$MEMCACHED_PORT |g" /etc/keystone/keystone.conf
-
-
+    sed -i "s|^\[glance_store]|$glance_store|g" /etc/glance/glance-api.conf
 
 }
 
@@ -196,7 +197,7 @@ function server_configuration(){
 # MAIN
 glance_api_setup
 server_configuration
-
+create_db
 sleep 111d
 
 
