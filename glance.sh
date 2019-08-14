@@ -140,10 +140,10 @@ function glance_setup(){
 
     # Glance endpoints (probably only public is going to be fine soon)
     echo "INFO [Glance]: Glance endpoint creation [admin]"
-    openstack endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$KEYSTONE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT $OS_ARGS
+    openstack endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$GLANCE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT $OS_ARGS
 
     echo "INFO [Glance]: Glance endpoint creation [internal]"
-    openstack endpoint create --region RegionOne image internal $GLANCE_INT_PROTO://$KEYSTONE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT $OS_ARGS
+    openstack endpoint create --region RegionOne image internal $GLANCE_INT_PROTO://$GLANCE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT $OS_ARGS
 
     echo "INFO [Glance]: Glance endpoint creation [public]"
     openstack endpoint create --region RegionOne image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT $OS_ARGS
