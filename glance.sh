@@ -107,50 +107,49 @@ function glance_setup(){
                 sleep 5
             fi
         done
-    # Openstack alias
-    alias openstack="openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-              --os-identity-api-version 3 --os-token='$token' $CERT_CHK "
+
+    OS_ARGS="--os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+              --os-identity-api-version 3 --os-token=$token $CERT_CHK"
 
     # openstack project create --domain default --description "Service Project" service
     echo "INFO [Glance]: CHECK SERVICE PROJECT IN CASE"
-
-    if openstack project show service --domain default;
+    if openstack project show service --domain default $OS_ARGS
       then echo "'service' project is exist"
-      else project create --domain default --description "Service Project" service
+      else openstack project create --domain default --description "Service Project" service $OS_ARGS
     fi
 
 
     # Create service user
     echo "INFO [Glance]: Create service user glance user name"
-    if openstack user show $GLANCE_SERVICE_USERNAME
+    if openstack user show $GLANCE_SERVICE_USERNAME $OS_ARGS
       then "$GLANCE_SERVICE_USERNAME is exist"
-      else openstack user create --domain default --password $GLANCE_SERVICE_USER_PASS $GLANCE_SERVICE_USERNAME
+      else openstack user create --domain default --password $GLANCE_SERVICE_USER_PASS $GLANCE_SERVICE_USERNAME $OS_ARGS
     fi
 
     # Admin role for Glance user in "service" project
     echo "INFO [Glance]: Admin role for Glance user in 'service' project "
-    openstack role add --project service --user $GLANCE_SERVICE_USERNAME admin
+    openstack role add --project service --user $GLANCE_SERVICE_USERNAME admin $OS_ARGS
 
     # Glance service creation
     echo "INFO [Glance]: Glance service creation"
-    if openstack service show glance
+    if openstack service show glance $OS_ARGS
       then echo "'glance' service exist."
-      else openstack service create --name glance --description "OpenStack Image" image
+      else openstack service create --name glance --description "OpenStack Image" image  $OS_ARGS
     fi
 
 
     # Glance endpoints (probably only public is going to be fine soon)
     echo "INFO [Glance]: Glance endpoint creation [admin]"
-    openstack endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$KEYSTONE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT
+    openstack endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$KEYSTONE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT $OS_ARGS
 
     echo "INFO [Glance]: Glance endpoint creation [internal]"
-    openstack endpoint create --region RegionOne image internal $GLANCE_INT_PROTO://$KEYSTONE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT
+    openstack endpoint create --region RegionOne image internal $GLANCE_INT_PROTO://$KEYSTONE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT $OS_ARGS
 
     echo "INFO [Glance]: Glance endpoint creation [public]"
-    openstack endpoint create --region RegionOne image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT
+    openstack endpoint create --region RegionOne image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT $OS_ARGS
 
     # Token revoke
-    openstack token revoke "$token"
+    openstack token revoke "$token" $OS_ARGS
 }
 
 # SET CONFIG FILES
