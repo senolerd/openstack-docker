@@ -1,23 +1,24 @@
 #!/bin/bash
 started=$(date +%s)
 DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
-echo "$DOCKER_HOST_ADDR"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+echo "$DOCKER_HOST"
+
 sleep 10
     yum install -y centos-release-openstack-$OS_VERSION  httpd mod_wsgi mariadb
     yum install -y openstack-glance python-openstackclient
