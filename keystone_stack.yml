@@ -47,14 +47,14 @@ services:
         gid: '163'
         mode: 0600
 
-      - source: 10.0.0.71.crt
-        target: 10.0.0.71.crt
+      - source: server.crt
+        target: server.crt
         uid: '163'
         gid: '163'
         mode: 0644
 
-      - source: 10.0.0.71.key
-        target: 10.0.0.71.key
+      - source: server.key
+        target: server.key
         uid: '163'
         gid: '163'
         mode: 0600
@@ -110,7 +110,7 @@ secrets:
     external: true
   fernet_1:
     external: true
-  10.0.0.71.crt:
-    external: true
-  10.0.0.71.key:
-    external: true
+  server.key:
+    file: ./tls/server.key
+  server.crt:
+    file: ./tls/server.crt
