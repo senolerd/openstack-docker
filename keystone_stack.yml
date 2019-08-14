@@ -98,9 +98,8 @@ services:
       - 8.8.8.8
     env_file:
       - openstack.env
-
-
-
+    environment:
+      - DOCKER_HOST=$DOCKER_HOST
 
 
 
