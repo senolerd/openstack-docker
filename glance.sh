@@ -109,7 +109,7 @@ function check_permissions(){
                 echo "##### TOKEN GELMIS OLMALI:  $token ####"
                 break
               else
-                echo "INFO [Glance]: Waiting to identity server [last try `date`]"
+                echo "INFO [Glance]: Waiting to identity server [`date`]"
                 sleep 3
             fi
         done
