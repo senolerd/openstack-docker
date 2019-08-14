@@ -1,25 +1,7 @@
 #!/bin/bash
 started=$(date +%s)
 DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
-echo "$DOCKER_HOST"
 
-sleep 10
     yum install -y centos-release-openstack-$OS_VERSION  httpd mod_wsgi mariadb
     yum install -y openstack-glance python-openstackclient
     echo "# INFO: GLANCE package installing done. #"
@@ -60,7 +42,7 @@ function check_permissions(){
 ###############################################################################
 
 # GLANCE SETUP
-function glance_setup(){
+function glance_api_setup(){
     INSECURE=$(echo "$INSECURE" | tr '[:upper:]' '[:lower:]')
     if [ "$INSECURE" == "true" ] ; then CERT_CHK=" --insecure ";fi
 
@@ -155,7 +137,6 @@ function glance_setup(){
       else openstack service create --name glance --description "OpenStack Image" image  $OS_ARGS
     fi
 
-
     # Glance endpoints (probably only public is going to be fine soon)
     echo "INFO [Glance]: Glance endpoint creation [admin]"
     openstack endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$GLANCE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT $OS_ARGS
@@ -168,14 +149,61 @@ function glance_setup(){
 
     # Token revoke
     openstack token revoke "$token" $OS_ARGS
+
 }
 
+
+
 # SET CONFIG FILES
+function server_configuration(){
+    # DB Connection
+
+    keystone_authtoken="
+    [keystone_authtoken]
+    www_authenticate_uri  = $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT
+    auth_url = $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION
+    memcached_servers = $MEMCACHED_HOST:$MEMCACHED_PORT
+    auth_type = password
+    project_domain_name = Default
+    user_domain_name = Default
+    project_name = service
+    username = $GLANCE_SERVICE_USERNAME
+    password = $GLANCE_SERVICE_USER_PASS
+    "
+
+
+    for conf_file in /etc/glance/glance-api.conf /etc/glance/glance-registry.conf ;
+      do
+        sed -i "s|^\[database]|[database]\nconnection = mysql+pymysql://$GLANCE_DB_USER:$GLANCE_USER_DB_PASS@$MYSQL_HOST/$GLANCE_DB_NAME|g" $conf_file
+      done
+
+    for conf_file in /etc/glance/glance-api.conf /etc/glance/glance-registry.conf ;
+      do
+        sed -i "s|^\[keystone_authtoken]|$keystone_authtoken|g" $conf_file
+      done
+
+
+
+
+#    sed -i "s|^\[database]|[database]\nconnection = mysql+pymysql://$KEYSTONE_DB_USER:$KEYSTONE_USER_DB_PASS@$MYSQL_HOST/$KEYSTONE_DB_NAME|g" /etc/keystone/keystone.conf
+#    sed -i "s|^\[token]|[token]\nprovider = fernet\ncaching = true|g" /etc/keystone/keystone.conf
+#    sed -i "s|^\[cache]|[cache]\nenable = true \nbackend = dogpile.cache.memcached \nbackend_argument = url:$MEMCACHED_HOST:$MEMCACHED_PORT |g" /etc/keystone/keystone.conf
+
+
+
+}
+
+
+
+
+
 
 # DB POPULATE
 
 # MAIN
 glance_setup
+server_configuration
+
 sleep 111d
 
 
