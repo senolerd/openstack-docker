@@ -61,7 +61,6 @@ services:
 
   db:
     image: mariadb:10.3.15
-#    restart: always
     ports:
       - 3306:3306
     dns:
@@ -72,20 +71,43 @@ services:
 
   adminer:
     image: adminer
-#    restart: always
     ports:
       - 8080:8080
 
   memcached:
     image: memcached:alpine
-#    restart: always
 
   rabbitmq:
     image: rabbitmq:3.7.17-rc.1-alpine
-#    restart: always
     env_file:
      - openstack.env
-#
+
+
+  glance:
+    image: centos:latest
+    command: |
+              bash -c " curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/glance.sh -o /glance_entrypoint.sh
+                        chmod +x /glance_entrypoint.sh
+                        /glance_entrypoint.sh
+                        /bin/bash || exit 0"
+    deploy:
+      replicas: 1
+#      placement:
+#        constraints: [ node.labels.type == static ]
+#    restart: always
+    ports:
+      - 9292:9292
+    dns:
+      - 8.8.8.8
+    env_file:
+      - openstack.env
+
+
+
+
+
+
+
 
 # These are the initial fernet keys. Need to be saved as a docker secret with name as secret before starting the stack.
 # Keystoe's api servers will mount them as their fernet keys.
@@ -96,6 +118,7 @@ services:
 # crediendial_0: CLOnhFQOoDHfiPpiJkN3LWTmylhanixBs__8HLRe92Q=
 # crediendial_1: 0kkN87jywQlDlwMS0ySRIzB752OFmSlhz6QyxvO_l78=
 #
+# Example of
 # echo 'asdfad' | docker secret create credential_0 -
 #
 # (the dash end of the command is included to command)

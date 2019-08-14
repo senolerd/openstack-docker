@@ -1,21 +1,21 @@
 #!/bin/bash
 start=$(date +%s)
-echo "#########################################"
-echo "#######    INSTALLING STARTED $start"
-echo "#########################################"
+echo "###################################################"
+echo "#######  KEYSTONE INSTALLING STARTED $start"
+echo "###################################################"
 
 start=$(date +%s)
 DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
     yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb
     yum install -y openstack-keystone mod_ssl
-    echo "# INFO: Package installing is done. #"
+    echo "# INFO: KEYSTONE Package installing is done. #"
 
-function create_keystone_db(){
+function create_db(){
     mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $KEYSTONE_DB_NAME;"
     mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'%' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
     mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'localhost' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
-    echo "# INFO: DB creating is done. #"
+    echo "# INFO: KEYSTONE DB creating is done. #"
     }
 
 function check_permissions(){
@@ -56,8 +56,8 @@ function keystone_setup(){
     sed -i "s|Listen 5000|Listen 5000\nServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
 
 
-    PUBLIC_ENDPOINT_TLS=$(echo "$PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
-    if [ "$PUBLIC_ENDPOINT_TLS" == "true" ]
+    KEYSTONE_PUBLIC_ENDPOINT_TLS=$(echo "$KEYSTONE_PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
+    if [ "$KEYSTONE_PUBLIC_ENDPOINT_TLS" == "true" ]
         then
             echo "#########################################"
             echo "########## HTTPS INSTALL     ############"
@@ -67,7 +67,7 @@ function keystone_setup(){
             mkdir $tls_dir
             ln -s /run/secrets/server.key $tls_dir/server.key
             ln -s /run/secrets/server.crt $tls_dir/server.crt
-            sed -i "s|5000>|$PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server.crt\n\tSSLCertificateKeyFile $tls_dir/server.key\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
+            sed -i "s|5000>|$KEYSTONE_PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server.crt\n\tSSLCertificateKeyFile $tls_dir/server.key\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
         else
             PROTO="http"
             echo "#########################################"
@@ -80,13 +80,13 @@ function populate_keystone(){
     su -s /bin/sh -c "keystone-manage db_sync" keystone
 
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
-    --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$PUBLIC_ENDPOINT_PORT/$PUBLIC_ENDPOINT_VERSION \
-    --bootstrap-internal-url $PROTO://$KEYSTONE_HOST:$INTERNAL_ENDPOINT_PORT/$INTERNAL_ENDPOINT_VERSION \
-    --bootstrap-region-id $KEYSTONE_REGION
+    --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_PUBLIC_ENDPOINT_PORT/$KEYSTONE_PUBLIC_ENDPOINT_VERSION \
+    --bootstrap-internal-url $PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+    --bootstrap-region-id $REGION
   }
 
 function install_first_node(){
-    create_keystone_db
+    create_db
     keystone_setup
     populate_keystone
     }

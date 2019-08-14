@@ -1,20 +1,169 @@
 #!/bin/bash
 start=$(date +%s)
+DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
-    yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb
+    yum install -y centos-release-openstack-$OS_VERSION  httpd mod_wsgi mariadb
     yum install -y openstack-glance python-openstackclient
-    yum clean all
-    echo "# INFO: PACKAGE INSTALLING IS DONE #"
+    echo "# INFO: GLANCE package installing done. #"
 
-function create_keystone_db(){
-    mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $KEYSTONE_DB_NAME;"
-    mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'%' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
-    mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $KEYSTONE_DB_NAME.* TO '$KEYSTONE_DB_USER'@'localhost' IDENTIFIED BY '$KEYSTONE_USER_DB_PASS';"
-    echo "# INFO: DB CREATING IS DONE #"
+function create_db(){
+    mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $GLANCE_DB_NAME;"
+    mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $GLANCE_DB_NAME.* TO '$GLANCE_DB_USER'@'%' IDENTIFIED BY '$GLANCE_USER_DB_PASS';"
+    mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $GLANCE_DB_NAME.* TO '$GLANCE_DB_USER'@'localhost' IDENTIFIED BY '$GLANCE_USER_DB_PASS';"
+    echo "# INFO: GLANCE DB  Creating is done #"
+    }
+
+###############################################################################
+###############################################################################
+
+# PERMISSION CHECK
+function check_permissions(){
+# https://docs.openstack.org/security-guide/identity/checklist.html
+
+    chown -R keystone:keystone /etc/keystone
+
+    echo "\nINFO: GLANCE All directories to be set 750"
+    for directory in $(find /etc/glance/ -type d) ; do
+        chmod 0750 $directory
+        echo $(stat -L -c "%a" $directory), Ownership: $(stat -L -c "%U %G" $directory | egrep "glance glance") " :: $directory"
+      done
+
+    echo "\nINFO: GLANCE All files to be set 640"
+    for file in $(find /etc/glance/ -type f) ; do
+        chmod 0640 $file
+        echo $(stat -L -c "%a" $file), Ownership: $(stat -L -c "%U %G" $file | egrep "glance glance") " :: $file "
+      done
+
+    echo "# INFO: GLANCE Permission check is done. #"
     }
 
 
+###############################################################################
+###############################################################################
 
+# GLANCE SETUP
+
+    KEYSTONE_INTERNAL_ENDPOINT_TLS=$(echo "$KEYSTONE_INTERNAL_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
+    if [ "$KEYSTONE_INTERNAL_ENDPOINT_TLS" == "true" ]
+      then KEYSTONE_PROTO="https"
+      else KEYSTONE_PROTO="http"
+    fi
+    echo "#### REMOVE ME: GLANCE KEYSTONE INTERNAL PROTO: $KEYSTONE_PROTO "
+
+
+    GLANCE_PUBLIC_ENDPOINT_TLS=$(echo "$GLANCE_PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
+    GLANCE_INTERNAL_ENDPOINT_TLS=$(echo "$GLANCE_INTERNAL_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
+    GLANCE_ADMIN_ENDPOINT_TLS=$(echo "$GLANCE_ADMIN_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
+
+    if [ "$GLANCE_PUBLIC_ENDPOINT_TLS" == "true" ]
+        then
+            echo "########## GLANCE PUBLIC HTTPS INSTALL ##"
+            GLANCE_PUB_PROTO="https"
+        else
+            GLANCE_PUB_PROTO="http"
+            echo "########## GLANCE PUBLIC HTTP INSTALL ###"
+    fi
+
+    if [ "$GLANCE_INTERNAL_ENDPOINT_TLS" == "true" ]
+        then
+            echo "########## GLANCE INTERNAL HTTPS INSTALL ##"
+            GLANCE_INT_PROTO="https"
+        else
+            GLANCE_INT_PROTO="http"
+            echo "########## GLANCE INTERNAL HTTP INSTALL ###"
+    fi
+
+
+    if [ "$GLANCE_ADMIN_ENDPOINT_TLS" == "true" ]
+        then
+            echo "########## GLANCE ADMIN HTTPS INSTALL ##"
+            GLANCE_ADM_PROTO="https"
+        else
+            GLANCE_ADM_PROTO="http"
+            echo "########## GLANCE ADMIN HTTP INSTALL ###"
+    fi
+
+###############################################################################
+###############################################################################
+    # Take Token
+    while true
+        do
+            if token=$(openstack token issue \
+                    --os-username admin \
+                    --os-password $ADMIN_PASS \
+                    --os-user-domain-id default \
+                    --os-project-name admin \
+                    --os-project-domain-id default \
+                    --os-auth-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+                    --os-identity-api-version 3 --insecure -f value |head -2)
+              then
+                echo "##### TOKEN GELMIS OLMALI:  $token ####"
+                break
+              else
+                echo "INFO [Glance]: Waiting to identity server [last try `date`]"
+                sleep 3
+            fi
+        done
+
+
+    # openstack project create --domain default --description "Service Project" service
+    echo "INFO [Glance]: CHECK SERVICE PROJECT IN CASE"
+    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+              --os-identity-api-version 3 \
+              --os-token $token --insecure \
+              project create --domain default --description "Service Project" service
+
+    # Create service user
+    echo "INFO [Glance]: Create service user $GLANCE_SERVICE_USERNAME "
+    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+              --os-identity-api-version 3 \
+              --os-token $token --insecure \
+              user create --domain default --password $GLANCE_SERVICE_USER_PASS $GLANCE_SERVICE_USERNAME
+
+    # Admin role for Glance user in "service" project
+    echo "INFO [Glance]: Admin role for Glance user in \"service\" project "
+    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+              --os-identity-api-version 3 \
+              --os-token $token --insecure \
+              role add --project service --user $GLANCE_SERVICE_USERNAME admin
+
+    # Glance service creation
+    echo "INFO [Glance]: Glance service creation"
+    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+              --os-identity-api-version 3 \
+              --os-token $token --insecure \
+              service create --name glance --description "OpenStack Image" image
+
+    # Glance endpoints
+    echo "INFO [Glance]: Glance endpoint creation [admin]"
+    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+              --os-identity-api-version 3 \
+              --os-token $token --insecure \
+              endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$KEYSTONE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT
+
+    echo "INFO [Glance]: Glance endpoint creation [internal]"
+    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+              --os-identity-api-version 3 \
+              --os-token $token --insecure \
+              endpoint create --region RegionOne image internal $GLANCE_INT_PROTO://$KEYSTONE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT
+
+    echo "INFO [Glance]: Glance endpoint creation [public]"
+    openstack --os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+              --os-identity-api-version 3 \
+              --os-token $token --insecure \
+              endpoint create --region RegionOne image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT
+
+
+
+
+
+# SET CONFIG FILES
+
+# DB POPULATE
+
+# MAIN
+
+sleep 111d
 
 
 
