@@ -88,7 +88,16 @@ function check_permissions(){
     # Take Token
     while true
         do
-            if token=$(openstack token issue \
+            if openstack token issue \
+                    --os-username admin \
+                    --os-password $ADMIN_PASS \
+                    --os-user-domain-id default \
+                    --os-project-name admin \
+                    --os-project-domain-id default \
+                    --os-auth-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+                    --os-identity-api-version 3
+              then
+                token=$(openstack token issue \
                     --os-username admin \
                     --os-password $ADMIN_PASS \
                     --os-user-domain-id default \
@@ -96,7 +105,7 @@ function check_permissions(){
                     --os-project-domain-id default \
                     --os-auth-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
                     --os-identity-api-version 3 --insecure -f value |head -2)
-              then
+
                 echo "##### TOKEN GELMIS OLMALI:  $token ####"
                 break
               else
