@@ -42,7 +42,7 @@ function check_permissions(){
 ###############################################################################
 
 # GLANCE SETUP
-
+function glance_setup(){
     KEYSTONE_INTERNAL_ENDPOINT_TLS=$(echo "$KEYSTONE_INTERNAL_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
     if [ "$KEYSTONE_INTERNAL_ENDPOINT_TLS" == "true" ]
       then KEYSTONE_PROTO="https"
@@ -162,13 +162,14 @@ function check_permissions(){
               --os-token="$token" --insecure \
               endpoint create --region RegionOne image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT
 
+}
 
 # SET CONFIG FILES
 
 # DB POPULATE
 
 # MAIN
-
+glance_setup
 sleep 111d
 
 
