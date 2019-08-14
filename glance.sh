@@ -172,10 +172,10 @@ function server_configuration(){
     \npassword = $GLANCE_SERVICE_USER_PASS \
     "
     glance_store="\
-    n\[glance_store] \
-    n\stores = file,http \
-    n\default_store = file \
-    n\filesystem_store_datadir = /var/lib/glance/images/ \
+    \n[glance_store] \
+    \nstores = file,http \
+    \ndefault_store = file \
+    \nfilesystem_store_datadir = /var/lib/glance/images/ \
     "
 
     for conf_file in /etc/glance/glance-api.conf /etc/glance/glance-registry.conf ;
