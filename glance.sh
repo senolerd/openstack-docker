@@ -170,7 +170,7 @@ function server_configuration(){
     keystone_authtoken="\
     \n[keystone_authtoken] \
     \nwww_authenticate_uri  = $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT \
-    \nauth_url = $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+    \nauth_url = $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT \
     \nmemcached_servers = $MEMCACHED_HOST:$MEMCACHED_PORT \
     \nauth_type = password \
     \nproject_domain_name = Default \
@@ -178,6 +178,7 @@ function server_configuration(){
     \nproject_name = service \
     \nusername = $GLANCE_SERVICE_USERNAME \
     \npassword = $GLANCE_SERVICE_USER_PASS \
+    \ninsecure = true\
     "
     glance_store="\
     \n[glance_store] \
@@ -208,7 +209,7 @@ create_db
 
 end=$(date +%s)
 echo "# INFO: GLANCE $OS_VERSION installing report: (started: $start, ended: $end, took $(expr $end - $started) secs )"
-glance-control all start
+glance-control api start
 
 sleep 111d
 
