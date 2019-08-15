@@ -32,10 +32,7 @@ function create_db(){
 
    }
 
-###############################################################################
-###############################################################################
 
-# PERMISSION CHECK
 function check_permissions(){
 # https://docs.openstack.org/security-guide/identity/checklist.html
 
@@ -56,8 +53,6 @@ function check_permissions(){
     echo "# INFO: GLANCE Permission check is done. #"
     }
 
-
-# GLANCE SETUP
 
 function take_token(){
     INSECURE=$(echo "$INSECURE" | tr '[:upper:]' '[:lower:]')
@@ -147,17 +142,17 @@ function glance_api_setup(){
     fi
 
     # Glance endpoints (probably only public is going to be fine soon)
-    if openstack service endpoint list  $OS_ARGS | grep image |grep public
+    if openstack endpoint list $OS_ARGS | grep image |grep public
       then echo "'glance' public endpoint exist."
       else openstack endpoint create --region RegionOne image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT $OS_ARGS
     fi
 
-    if openstack service endpoint list  $OS_ARGS | grep image |grep internal
+    if openstack endpoint list $OS_ARGS | grep image |grep internal
       then echo "'glance' public endpoint exist."
       else openstack endpoint create --region RegionOne image internal $GLANCE_INT_PROTO://$GLANCE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT $OS_ARGS
     fi
 
-    if openstack service endpoint list  $OS_ARGS | grep image |grep admin
+    if openstack endpoint list $OS_ARGS | grep image |grep admin
       then echo "'glance' public endpoint exist."
       else openstack endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$GLANCE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT $OS_ARGS
     fi
@@ -212,8 +207,9 @@ server_configuration
 create_db
 
 end=$(date +%s)
-echo "# INFO: GLANCE $OS_VERSION installing report: (started: $start, ended: $end, took $(expr $end - $start) secs )"
-# glance-control
+echo "# INFO: GLANCE $OS_VERSION installing report: (started: $start, ended: $end, took $(expr $end - $started) secs )"
+glance-control all start
+
 sleep 111d
 
 
