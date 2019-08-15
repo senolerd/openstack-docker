@@ -81,6 +81,7 @@ function populate_keystone(){
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
     --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_PUBLIC_ENDPOINT_PORT/$KEYSTONE_PUBLIC_ENDPOINT_VERSION \
     --bootstrap-internal-url $PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+    --bootstrap-admin-url $PROTO://$KEYSTONE_HOST:$KEYSTONE_ADMIN_ENDPOINT_PORT/$KEYSTONE_ADMIN_ENDPOINT_VERSION \
     --bootstrap-region-id $REGION
   }
 
