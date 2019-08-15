@@ -13,6 +13,7 @@ fi
     echo "# INFO: GLANCE package installing done. #"
 
 function create_db(){
+    echo "create_db started"
 
     while true
       do
@@ -29,6 +30,7 @@ function create_db(){
             break
         fi
       done
+    echo "create_db ended"
 
    }
 
@@ -55,6 +57,8 @@ function check_permissions(){
 
 
 function take_token(){
+    echo "take_token started"
+
     INSECURE=$(echo "$INSECURE" | tr '[:upper:]' '[:lower:]')
     if [ "$INSECURE" == "true" ] ; then CERT_CHK=" --insecure ";fi
 
@@ -69,10 +73,14 @@ function take_token(){
 
      OS_ARGS="--os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
                 --os-identity-api-version 3 --os-token=$token $CERT_CHK"
+
+    echo "take_token ended"
+
 }
 
 
 function glance_api_setup(){
+    echo "glance_api_setup started"
 
     echo "#### REMOVE ME: GLANCE KEYSTONE INTERNAL PROTO: $KEYSTONE_PROTO "
 
@@ -159,6 +167,7 @@ function glance_api_setup(){
 
     # Token revoke
     openstack token revoke "$token" $OS_ARGS
+    echo "glance_api_setup ended"
 
 }
 
@@ -166,7 +175,7 @@ function glance_api_setup(){
 
 # SET CONFIG FILES
 function server_configuration(){
-
+    echo "server_configuration started"
     keystone_authtoken="\
     \n[keystone_authtoken] \
     \nwww_authenticate_uri  = $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT \
@@ -195,6 +204,7 @@ function server_configuration(){
       done
 
     sed -i "s|^\[glance_store]|$glance_store|g" /etc/glance/glance-api.conf
+    echo "server_configuration ended"
 
 }
 
