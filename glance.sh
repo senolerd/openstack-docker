@@ -58,9 +58,26 @@ function check_permissions(){
 
 
 # GLANCE SETUP
-function glance_api_setup(){
+
+function take_token(){
     INSECURE=$(echo "$INSECURE" | tr '[:upper:]' '[:lower:]')
     if [ "$INSECURE" == "true" ] ; then CERT_CHK=" --insecure ";fi
+
+    token=$(openstack token issue \
+                      --os-username admin \
+                      --os-password $ADMIN_PASS \
+                      --os-user-domain-id default \
+                      --os-project-name admin \
+                      --os-project-domain-id default \
+                      --os-auth-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+                      --os-identity-api-version 3 $CERT_CHK -f value|grep gAAA)
+
+     OS_ARGS="--os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
+                --os-identity-api-version 3 --os-token=$token $CERT_CHK"
+}
+
+
+function glance_api_setup(){
 
     echo "#### REMOVE ME: GLANCE KEYSTONE INTERNAL PROTO: $KEYSTONE_PROTO "
 
@@ -90,17 +107,9 @@ function glance_api_setup(){
              echo "########## GLANCE ADMIN HTTP INSTALL ###"
     fi
 
-    # Try to take a token until it's sent
     while true
         do
-            if token=$(openstack token issue \
-                    --os-username admin \
-                    --os-password $ADMIN_PASS \
-                    --os-user-domain-id default \
-                    --os-project-name admin \
-                    --os-project-domain-id default \
-                    --os-auth-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-                    --os-identity-api-version 3 $CERT_CHK -f value|grep gAAA)
+            if take_token
               then
                 echo "##### Remove Me: TOKEN:  $token ####"
                 break
@@ -110,8 +119,6 @@ function glance_api_setup(){
             fi
         done
 
-    OS_ARGS="--os-url $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-              --os-identity-api-version 3 --os-token=$token $CERT_CHK"
 
     # openstack project create --domain default --description "Service Project" service
     echo "INFO [Glance]: CHECK SERVICE PROJECT IN CASE"
@@ -140,14 +147,20 @@ function glance_api_setup(){
     fi
 
     # Glance endpoints (probably only public is going to be fine soon)
-    echo "INFO [Glance]: Glance endpoint creation [admin]"
-    openstack endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$GLANCE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT $OS_ARGS
+    if openstack service endpoint list  $OS_ARGS | grep image |grep public
+      then echo "'glance' public endpoint exist."
+      else openstack endpoint create --region RegionOne image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT $OS_ARGS
+    fi
 
-    echo "INFO [Glance]: Glance endpoint creation [internal]"
-    openstack endpoint create --region RegionOne image internal $GLANCE_INT_PROTO://$GLANCE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT $OS_ARGS
+    if openstack service endpoint list  $OS_ARGS | grep image |grep internal
+      then echo "'glance' public endpoint exist."
+      else openstack endpoint create --region RegionOne image internal $GLANCE_INT_PROTO://$GLANCE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT $OS_ARGS
+    fi
 
-    echo "INFO [Glance]: Glance endpoint creation [public]"
-    openstack endpoint create --region RegionOne image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT $OS_ARGS
+    if openstack service endpoint list  $OS_ARGS | grep image |grep admin
+      then echo "'glance' public endpoint exist."
+      else openstack endpoint create --region RegionOne image admin $GLANCE_ADM_PROTO://$GLANCE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT $OS_ARGS
+    fi
 
     # Token revoke
     openstack token revoke "$token" $OS_ARGS
@@ -191,15 +204,16 @@ function server_configuration(){
 
 
 
-
-
-
 # DB POPULATE
 
 # MAIN
 glance_api_setup
 server_configuration
 create_db
+
+end=$(date +%s)
+echo "# INFO: GLANCE $OS_VERSION installing report: (started: $start, ended: $end, took $(expr $end - $start) secs )"
+# glance-control
 sleep 111d
 
 
