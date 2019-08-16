@@ -83,7 +83,7 @@ services:
      - openstack.env
 
 
-  glance_api:
+  glance-api:
     image: centos:latest
     command: |
               bash -c " curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/glance.sh -o /glance_entrypoint.sh

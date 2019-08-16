@@ -178,7 +178,6 @@ function server_configuration(){
     echo "server_configuration started"
     keystone_authtoken="\
     \n[keystone_authtoken] \
-    \nwww_authenticate_uri  = $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT \
     \nauth_url = $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT \
     \nmemcached_servers = $MEMCACHED_HOST:$MEMCACHED_PORT \
     \nauth_type = password \
@@ -205,9 +204,7 @@ function server_configuration(){
 
     sed -i "s|^\[glance_store]|$glance_store|g" /etc/glance/glance-api.conf
     echo "server_configuration ended"
-
 }
-
 
 
 # DB POPULATE

@@ -58,9 +58,7 @@ function keystone_setup(){
     KEYSTONE_PUBLIC_ENDPOINT_TLS=$(echo "$KEYSTONE_PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
     if [ "$KEYSTONE_PUBLIC_ENDPOINT_TLS" == "true" ]
         then
-            echo "#########################################"
             echo "########## HTTPS INSTALL     ############"
-            echo "#########################################"
             PROTO="https"
             tls_dir="/etc/keystone/tls"
             mkdir $tls_dir
@@ -68,10 +66,8 @@ function keystone_setup(){
             ln -s /run/secrets/server.crt $tls_dir/server.crt
             sed -i "s|5000>|$KEYSTONE_PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server.crt\n\tSSLCertificateKeyFile $tls_dir/server.key\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
         else
-            PROTO="http"
-            echo "#########################################"
             echo "########## HTTP INSTALL      ############"
-            echo "#########################################"
+            PROTO="http"
     fi
     }
 
@@ -79,21 +75,12 @@ function populate_keystone(){
     su -s /bin/sh -c "keystone-manage db_sync" keystone
 
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
-    --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_PUBLIC_ENDPOINT_PORT/$KEYSTONE_PUBLIC_ENDPOINT_VERSION \
-    --bootstrap-internal-url $PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT/$KEYSTONE_INTERNAL_ENDPOINT_VERSION \
-    --bootstrap-admin-url $PROTO://$KEYSTONE_HOST:$KEYSTONE_ADMIN_ENDPOINT_PORT/$KEYSTONE_ADMIN_ENDPOINT_VERSION \
+    --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_PUBLIC_ENDPOINT_PORT \
+    --bootstrap-internal-url $PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT \
+    --bootstrap-admin-url $PROTO://$KEYSTONE_HOST:$KEYSTONE_ADMIN_ENDPOINT_PORT \
     --bootstrap-region-id $REGION
   }
 
-function install_first_node(){
-    create_db
-    keystone_setup
-    populate_keystone
-    }
-
-function add_new_node(){
-    keystone_setup
-    }
 
 function main(){
     while true
@@ -102,11 +89,12 @@ function main(){
                 echo "# INFO: SQL connected. $(date)"
                 if  mysql -u $KEYSTONE_DB_USER -h $MYSQL_HOST -p$KEYSTONE_USER_DB_PASS -e 'quit' 2> /dev/null ; then
                   echo "# INFO: Installing additional api node."
-                  add_new_node
-
+                  keystone_setup
                 else
                   echo "# INFO: Installing new api node node ."
-                  install_first_node
+                  create_db
+                  keystone_setup
+                  populate_keystone
                 fi
                 break
           else
