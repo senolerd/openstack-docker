@@ -1,16 +1,11 @@
 #!/bin/bash
 echo "--------------------------------------------------------"
-clear
 export base=$(pwd)
 export $(cat openstack.env |grep -v "#")
 export DOCKER_HOST_ADDR=$(docker info|grep "Manager Addresses" -A 1|tail -1|awk -F: {'print $1'}|awk -F" " '{print $1}')
-echo base: $base
+echo "--------------------------------------------------------"
 
-echo "--------------------------------------------------------"
-echo $OVERLAY_NET_NAME
-echo $REGION
-echo $OS_VERSION
-echo "--------------------------------------------------------"
+
 INSECURE=$(echo "$INSECURE" | tr '[:upper:]' '[:lower:]')
 case $INSECURE in
 false)
