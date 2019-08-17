@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -config tls/os_opnssl.cnf -keyout tls/server.key -out tls/server.crt
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -config $base/etc/os_opnssl.cnf -keyout $base/etc/server.key -out $base/etc/server.crt
