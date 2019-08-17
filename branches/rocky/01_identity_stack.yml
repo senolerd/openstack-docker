@@ -9,7 +9,7 @@ services:
   keystone-api:
     image: centos:latest
     command: |
-              bash -c "# Keystone automatic orange
+              bash -c "# keystone-api
                        curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/branches/$OS_VERSION/etc/keystone.sh -o /keystone_entrypoint.sh
                        chmod +x /keystone_entrypoint.sh
                        /keystone_entrypoint.sh
