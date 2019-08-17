@@ -1,0 +1,25 @@
+version: "3.6"
+
+networks:
+  default:
+    external: true
+    name: "$OVERLAY_NET_NAME"
+
+services:
+  glance-api:
+    image: centos:latest
+    command: |
+              bash -c " curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/glance.sh -o /glance_entrypoint.sh
+                        chmod +x /glance_entrypoint.sh
+                        /glance_entrypoint.sh
+                        /bin/bash || exit 0"
+    deploy:
+      replicas: 1
+    ports:
+      - "${GLANCE_PUBLIC_ENDPOINT_PORT}:${GLANCE_PUBLIC_ENDPOINT_PORT}"
+    dns:
+      - 8.8.8.8
+    env_file:
+      - "${base}/openstack.env"
+    environment:
+      - DOCKER_HOST=$DOCKER_HOST
