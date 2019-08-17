@@ -7,7 +7,7 @@ networks:
 
 services:
   glance-api:
-    image: centos:latest
+    image: "$GLANCE_DOCKER_IMAGE"
     command: |
               bash -c "# glance-api
                         curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/branches/$OS_VERSION/etc/glance.sh -o /glance_entrypoint.sh

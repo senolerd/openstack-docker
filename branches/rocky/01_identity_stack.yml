@@ -7,7 +7,7 @@ networks:
 
 services:
   keystone-api:
-    image: centos:latest
+    image: "$KEYSTONE_DOCKER_IMAGE"
     command: |
               bash -c "# keystone-api
                        curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/branches/$OS_VERSION/etc/keystone.sh -o /keystone_entrypoint.sh
@@ -66,7 +66,7 @@ services:
         mode: 0600
 
   keystone-db:
-    image: mariadb:10.3.15
+    image: "$MYSQL_DOCKER_IMAGE"
     ports:
      - "$MYSQL_PORT:$MYSQL_PORT"
     dns:
@@ -81,10 +81,10 @@ services:
       - "$KEYSTONE_ADMINER_PORT:$KEYSTONE_ADMINER_PORT"
 
   keystone-memcached:
-    image: memcached:alpine
+    image: "$MEMCACHED_DOCKER_IMAGE"
 
   keystone-rabbitmq:
-    image: rabbitmq:3.7.17-rc.1-alpine
+    image: "$RABBITMQ_DOCKER_IMAGE"
     env_file:
      - "${base}/openstack.env"
 
