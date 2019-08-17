@@ -1,7 +1,7 @@
 #!/bin/bash
 started=$(date +%s)
 
-DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
+# DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 KEYSTONE_INTERNAL_ENDPOINT_TLS=$(echo "$KEYSTONE_INTERNAL_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
 if [ "$KEYSTONE_INTERNAL_ENDPOINT_TLS" == "true" ]
   then KEYSTONE_PROTO="https"

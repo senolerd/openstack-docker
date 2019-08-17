@@ -4,7 +4,7 @@ echo "###################################################"
 echo "#######  KEYSTONE INSTALLING STARTED $start"
 echo "###################################################"
 
-DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
+# DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
 echo $DOCKER_HOST_ADDR
 echo $DOCKER_HOST_ADDR
