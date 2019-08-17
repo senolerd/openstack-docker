@@ -6,6 +6,25 @@ echo "###################################################"
 
 DOCKER_HOST_ADDR=$(echo "$DOCKER_HOST" |awk -F'//' {'print $2'}|awk -F':' {'print $1'})
 
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+echo $DOCKER_HOST_ADDR
+sleep 20
+
+
     yum install -y centos-release-openstack-$OS_VERSION  python-openstackclient httpd mod_wsgi mariadb
     yum install -y openstack-keystone mod_ssl
     echo "# INFO: KEYSTONE Package installing is done. #"

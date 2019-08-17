@@ -4,7 +4,7 @@ services:
   keystone-api:
     image: centos:latest
     command: |
-              bash -c " # Keystone's automatic orange
+              bash -c "# Keystone's automatic orange
                         curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/keystone.sh -o /keystone_entrypoint.sh
                         chmod +x /keystone_entrypoint.sh
                         /keystone_entrypoint.sh
@@ -87,7 +87,7 @@ services:
   glance-api:
     image: centos:latest
     command: |
-              bash -c " # Glance's automatic orange
+              bash -c "# Glance's automatic orange
                         curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/glance.sh -o /glance_entrypoint.sh
                         chmod +x /glance_entrypoint.sh
                         /glance_entrypoint.sh
