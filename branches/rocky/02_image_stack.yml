@@ -8,8 +8,7 @@ networks:
 services:
   glance-api:
     image: centos:latest
-    command: |
-              bash -c " curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/branches/$OS_VERSION/glance.sh -o /glance_entrypoint.sh
+              bash -c " curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/branches/$OS_VERSION/etc/glance.sh -o /glance_entrypoint.sh
                         chmod +x /glance_entrypoint.sh
                         /glance_entrypoint.sh
                         /bin/bash || exit 0"
