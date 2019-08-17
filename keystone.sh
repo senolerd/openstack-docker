@@ -91,8 +91,10 @@ function keystone_setup(){
     }
 
 function populate_keystone(){
+    echo "# INFO: DB populate."
     su -s /bin/sh -c "keystone-manage db_sync" keystone
 
+    echo "# INFO: Bootstrap, Prpto: \'$PROTO\', DOCKER_HOST: \'$DOCKER_HOST_ADDR\', \'$KEYSTONE_PUBLIC_ENDPOINT_PORT\'"
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
     --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_PUBLIC_ENDPOINT_PORT \
     --bootstrap-internal-url $PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT \
