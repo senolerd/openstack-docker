@@ -13,7 +13,6 @@ services:
                        curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/branches/$OS_VERSION/etc/keystone.sh -o /keystone_entrypoint.sh
                        chmod +x /keystone_entrypoint.sh
                        /keystone_entrypoint.sh
-                       httpd -DFOREGROUND
                        /bin/bash || exit 0"
     deploy:
       replicas: 1
@@ -69,7 +68,7 @@ services:
   keystone-db:
     image: ${MYSQL_DOCKER_IMAGE}
     ports:
-     - ${MYSQL_PORT:$MYSQL_PORT}
+     - ${MYSQL_PORT}:${MYSQL_PORT}
     dns:
       - 8.8.8.8
       - 8.8.4.4
@@ -79,7 +78,7 @@ services:
   keystone-adminer:
     image: adminer
     ports:
-      - ${KEYSTONE_ADMINER_PORT:$KEYSTONE_ADMINER_PORT}
+      - ${KEYSTONE_ADMINER_PORT}:${KEYSTONE_ADMINER_PORT}
 
   keystone-memcached:
     image: ${MEMCACHED_DOCKER_IMAGE}
@@ -91,14 +90,14 @@ services:
 
 secrets:
   credential_0:
-    file: ${base}/branches/${OS_VERSION}/etc/credential_0
+    file: ${base}/branches/$OS_VERSION/etc/credential_0
   credential_1:
-    file: ${base}/branches/${OS_VERSION}/etc/credential_1
+    file: ${base}/branches/$OS_VERSION/etc/credential_1
   fernet_0:
-    file: ${base}/branches/${OS_VERSION}/etc/fernet_0
+    file: ${base}/branches/$OS_VERSION/etc/fernet_0
   fernet_1:
-    file: ${base}/branches/${OS_VERSION}/etc/fernet_1
+    file: ${base}/branches/$OS_VERSION/etc/fernet_1
   server.key:
-    file: ${base}/branches/${OS_VERSION}/etc/server.key
+    file: ${base}/branches/$OS_VERSION/etc/server.key
   server.crt:
-    file: ${base}/branches/${OS_VERSION}/etc/server.crt
+    file: ${base}/branches/$OS_VERSION/etc/server.crt
