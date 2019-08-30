@@ -106,8 +106,6 @@ function main(){
 
     check_permissions
     echo "# INFO: $OS_VERSION installing report: (started: $start, ended: $end, took $(expr $end - $start) secs )"
-    httpd -DFOREGROUND
-
 
     }
 
