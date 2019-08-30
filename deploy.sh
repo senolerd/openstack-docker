@@ -28,7 +28,20 @@ deploy(){
     docker -D stack deploy -c $base/branches/$OS_VERSION/$stack OS_$stack_name
     echo "-----------"
     done
-}
+    }
+
+purge(){
+  stack_list=($(ls -lX $base/branches/rocky|grep yml|awk -F' ' '{print $9}'))
+
+  for stack in ${stack_list[@]};do
+    stack_name=$(echo $stack|awk -F_ '{print $2}')
+    echo "-----------"
+    echo stack: $stack
+    echo stack_name: $stack_name
+    docker -D stack rm -c $base/branches/$OS_VERSION/$stack OS_$stack_name
+    echo "-----------"
+    done
+    }
 
 deploy
 echo $DOCKER_HOST_ADDR
