@@ -13,7 +13,7 @@ services:
                        curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/branches/$OS_VERSION/etc/keystone.sh -o /keystone_entrypoint.sh
                        chmod +x /keystone_entrypoint.sh
                        /keystone_entrypoint.sh
-                       systemctl start httpd
+                       httpd -DFOREGROUND
                        sleep 111d
                        /bin/bash || exit 0"
     deploy:
