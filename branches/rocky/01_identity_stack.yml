@@ -3,11 +3,11 @@ version: "3.6"
 networks:
   default:
     external: true
-    name: $OVERLAY_NET_NAME
+    name: ${OVERLAY_NET_NAME}
 
 services:
   keystone-api:
-    image: $KEYSTONE_DOCKER_IMAGE
+    image: ${KEYSTONE_DOCKER_IMAGE}
     command: |
               bash -c "# keystone-api
                        curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/branches/$OS_VERSION/etc/keystone.sh -o /keystone_entrypoint.sh
@@ -28,7 +28,7 @@ services:
     env_file:
       - ${base}/openstack.env
     environment:
-      - DOCKER_HOST_ADDR=$DOCKER_HOST_ADDR
+      - DOCKER_HOST_ADDR=${DOCKER_HOST_ADDR}
     secrets:
       - source: credential_0
         target: credential_0
@@ -67,9 +67,9 @@ services:
         mode: 0600
 
   keystone-db:
-    image: $MYSQL_DOCKER_IMAGE
+    image: ${MYSQL_DOCKER_IMAGE}
     ports:
-     - $MYSQL_PORT:$MYSQL_PORT
+     - ${MYSQL_PORT:$MYSQL_PORT}
     dns:
       - 8.8.8.8
       - 8.8.4.4
@@ -79,26 +79,26 @@ services:
   keystone-adminer:
     image: adminer
     ports:
-      - $KEYSTONE_ADMINER_PORT:$KEYSTONE_ADMINER_PORT
+      - ${KEYSTONE_ADMINER_PORT:$KEYSTONE_ADMINER_PORT}
 
   keystone-memcached:
-    image: $MEMCACHED_DOCKER_IMAGE
+    image: ${MEMCACHED_DOCKER_IMAGE}
 
   keystone-rabbitmq:
-    image: $RABBITMQ_DOCKER_IMAGE
+    image: ${RABBITMQ_DOCKER_IMAGE}
     env_file:
      - ${base}/openstack.env
 
 secrets:
   credential_0:
-    file: "$base/branches/$OS_VERSION/etc/credential_0"
+    file: ${base}/branches/${OS_VERSION}/etc/credential_0
   credential_1:
-    file: "$base/branches/$OS_VERSION/etc/credential_1"
+    file: ${base}/branches/${OS_VERSION}/etc/credential_1
   fernet_0:
-    file: "$base/branches/$OS_VERSION/etc/fernet_0"
+    file: ${base}/branches/${OS_VERSION}/etc/fernet_0
   fernet_1:
-    file: "$base/branches/$OS_VERSION/etc/fernet_1"
+    file: ${base}/branches/${OS_VERSION}/etc/fernet_1
   server.key:
-    file: "$base/branches/$OS_VERSION/etc/server.key"
+    file: ${base}/branches/${OS_VERSION}/etc/server.key
   server.crt:
-    file: "$base/branches/$OS_VERSION/etc/server.crt"
+    file: ${base}/branches/${OS_VERSION}/etc/server.crt
