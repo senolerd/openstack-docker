@@ -3,11 +3,11 @@ version: "3.6"
 networks:
   default:
     external: true
-    name: $OVERLAY_NET_NAME
+    name: ${OVERLAY_NET_NAME}
 
 services:
   glance-api:
-    image: $GLANCE_DOCKER_IMAGE
+    image: ${GLANCE_DOCKER_IMAGE}
     command: |
               bash -c "# glance-api
                         curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/branches/$OS_VERSION/etc/glance.sh -o /glance_entrypoint.sh
@@ -23,5 +23,4 @@ services:
     env_file:
       - ${base}/openstack.env
     environment:
-      - DOCKER_HOST=$DOCKER_HOST
-
+      - DOCKER_HOST=${DOCKER_HOST}
