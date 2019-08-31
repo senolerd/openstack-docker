@@ -107,6 +107,8 @@ function main(){
 
     check_permissions
     echo "# INFO: $OS_VERSION installing report: (started: $start, ended: $end, took $(expr $end - $start) secs )"
+    echo -e "\n\nCertificate Chain\n\n"
+    cat /etc/keystone/tls/ca_chain.pem
 
     }
 
