@@ -63,7 +63,7 @@ function keystone_setup(){
             ln -s /run/secrets/server_key.pem $tls_dir/server_key.pem
             ln -s /run/secrets/server_crt.pem $tls_dir/server_crt.pem
             ln -s /run/secrets/ca_chain.pem $tls_dir/ca_chain.pem            
-            sed -i "s|5000>|$KEYSTONE_PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server_key.pem\n\tSSLCertificateKeyFile $tls_dir/server_crt.pem\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
+            sed -i "s|5000>|$KEYSTONE_PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server_crt.pem\n\tSSLCertificateKeyFile $tls_dir/server_key.pem\n\tSSLCertificateChainFile $tls_dir/ca_chain.pem\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
         else
             echo "########## HTTP INSTALL      ############"
             PROTO="http"
