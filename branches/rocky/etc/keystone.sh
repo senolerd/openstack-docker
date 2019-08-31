@@ -60,9 +60,10 @@ function keystone_setup(){
             PROTO="https"
             tls_dir="/etc/keystone/tls"
             mkdir $tls_dir
-            ln -s /run/secrets/server.key $tls_dir/server.key
-            ln -s /run/secrets/server.crt $tls_dir/server.crt
-            sed -i "s|5000>|$KEYSTONE_PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server.crt\n\tSSLCertificateKeyFile $tls_dir/server.key\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
+            ln -s /run/secrets/server_key.pem $tls_dir/server_key.pem
+            ln -s /run/secrets/server_crt.pem $tls_dir/server_crt.pem
+            ln -s /run/secrets/ca_chain.pem $tls_dir/ca_chain.pem            
+            sed -i "s|5000>|$KEYSTONE_PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server_key.pem\n\tSSLCertificateKeyFile $tls_dir/server_crt.pem\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
         else
             echo "########## HTTP INSTALL      ############"
             PROTO="http"
