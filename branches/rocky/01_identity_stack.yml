@@ -13,7 +13,7 @@ services:
                        curl https://raw.githubusercontent.com/senolerd/openstack-docker/master/branches/$OS_VERSION/etc/keystone.sh -o /keystone_entrypoint.sh
                        chmod +x /keystone_entrypoint.sh
                        /keystone_entrypoint.sh
-                       httpd
+                       httpd -DFOREGROUND
                        sleep 111d
                        /bin/bash || exit 0"
     deploy:
@@ -55,17 +55,24 @@ services:
         gid: '163'
         mode: 0600
 
-      - source: server.crt
-        target: server.crt
+      - source: server_key.pem
+        target: server_key.pem
+        uid: '163'
+        gid: '163'
+        mode: 0400
+
+      - source: server_crt.pem
+        target: server_crt.pem
         uid: '163'
         gid: '163'
         mode: 0644
 
-      - source: server.key
-        target: server.key
+      - source: ca_chain.pem
+        target: ca_chain.pem
         uid: '163'
         gid: '163'
-        mode: 0600
+        mode: 0644
+
 
   keystone-db:
     image: ${MYSQL_DOCKER_IMAGE}
@@ -99,7 +106,9 @@ secrets:
     file: ${base}/branches/$OS_VERSION/etc/fernet_0
   fernet_1:
     file: ${base}/branches/$OS_VERSION/etc/fernet_1
-  server.key:
-    file: ${base}/branches/$OS_VERSION/etc/server.key
-  server.crt:
-    file: ${base}/branches/$OS_VERSION/etc/server.crt
+  server_key.pem:
+    file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/private/${DOCKER_HOST_ADDR}.key.pem
+  server_crt.pem:
+    file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/certs/${DOCKER_HOST_ADDR}.cert.pem
+  ca_chain.pem:
+    file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/certs/ca-chain.cert.pem
