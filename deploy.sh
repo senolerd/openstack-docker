@@ -1,21 +1,39 @@
 #!/bin/bash
-echo "--------------------------------------------------------"
 export base=$(pwd)
-export $(cat openstack.env |grep -v "#")
-export DOCKER_HOST_ADDR=$(docker info|grep "Manager Addresses" -A 1|tail -1|awk -F: {'print $1'}|awk -F" " '{print $1}')
-echo "--------------------------------------------------------"
+
+set_env(){
+
+  for line_no in $(seq 1 $(grep '^[A-Z]' openstack.env|wc -l))
+    do
+     line_content=$(grep '^[A-Z]' openstack.env|head -$line_no|tail -1)
+     variable=$(echo $line_content|awk -F= {'print $1'})
+     value=$(echo $line_content|awk -F= {'print $2'})
+     export $variable="$value"
+    done
+    export DOCKER_HOST_ADDR=$(docker info|grep "Manager Addresses" -A 1|tail -1|awk -F: {'print $1'}|awk -F" " '{print $1}')
+  }
 
 
-INSECURE=$(echo "$INSECURE" | tr '[:upper:]' '[:lower:]')
-case $INSECURE in
-false)
- echo "!! INSECURE is false in the env file, i'm not ready for that for now !!";exit;;
-esac
+make_pki(){
+  target_host=$(docker node ls --format "{{.Hostname}}:{{.ManagerStatus}}"|grep Leader|awk -F: {'print $1'})
+  export target_host=$target_host
+  INSECURE=$(echo "$INSECURE" | tr '[:upper:]' '[:lower:]')
+  case $INSECURE in
+  false)
+    echo "!! INSECURE is false in the env file, No TLS for ya";exit
+    ;;
+  true)
+    echo "TLS is being done"
+    $base/branches/$OS_VERSION/etc/create_cert.sh
+    cd $base/branches/$OS_VERSION/etc/
+    . create_cert.sh $DOCKER_HOST_ADDR
+    ;;
+  esac
+  }
 
-branches/rocky/etc/create_cert.sh
-docker network create -d overlay --attachable $OVERLAY_NET_NAME
-
-
+network(){
+  docker network create -d overlay --attachable $OVERLAY_NET_NAME
+  }
 
 deploy(){
   stack_list=($(ls -lX $base/branches/rocky|grep yml|awk -F' ' '{print $9}'))
@@ -43,6 +61,13 @@ purge(){
     done
     }
 
-deploy
-echo $DOCKER_HOST_ADDR
-echo "--- EoF ---"
+pipeline(){
+  set_env
+  make_pki
+  network
+  deploy
+}
+
+pipeline
+echo "--- EoDeployment ---"
+echo "$DOCKER_HOST_ADDR"
