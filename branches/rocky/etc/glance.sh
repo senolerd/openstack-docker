@@ -150,7 +150,7 @@ function glance_api_setup(){
 
     # Glance endpoints (probably only public is going to be fine soon)
     if openstack endpoint list --service glance --interface public /dev/null 2>&1
-      then echo "'glance' public endpoint exist."
+      then echo "'glance' public endpoint exist." 
       else openstack endpoint create --region $REGION image public $GLANCE_PUB_PROTO://$DOCKER_HOST_ADDR:$GLANCE_PUBLIC_ENDPOINT_PORT $OS_ARGS
     fi
 

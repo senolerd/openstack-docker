@@ -1,0 +1,1 @@
+V	290829222548Z		1000	unknown	/C=US/ST=New York/O=Underwood Telco/OU=Underwood Telco Intermediate Certificate Authority/CN=Underwood Telco Intermediate CA

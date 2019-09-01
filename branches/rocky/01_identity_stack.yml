@@ -5,6 +5,11 @@ networks:
     external: true
     name: ${OVERLAY_NET_NAME}
 
+# networks:
+#   default:
+#     name: ${OVERLAY_NET_NAME}
+
+
 services:
   keystone-api:
     image: ${KEYSTONE_DOCKER_IMAGE}
@@ -107,8 +112,8 @@ secrets:
   fernet_1:
     file: ${base}/branches/$OS_VERSION/etc/fernet_1
   server_key.pem:
-    file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/private/${DOCKER_HOST_ADDR}.key.pem
+    file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/private/$target_host.key.pem
   server_crt.pem:
-    file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/certs/${DOCKER_HOST_ADDR}.cert.pem
+    file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/certs/$target_host.cert.pem
   ca_chain.pem:
     file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/certs/ca-chain.cert.pem

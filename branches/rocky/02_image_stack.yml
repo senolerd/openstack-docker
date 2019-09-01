@@ -23,4 +23,4 @@ services:
     env_file:
       - ${base}/openstack.env
     environment:
-      - DOCKER_HOST=${DOCKER_HOST}
+      - DOCKER_HOST_ADDR=${DOCKER_HOST_ADDR}
