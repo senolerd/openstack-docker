@@ -50,7 +50,7 @@ function keystone_setup(){
 
     KEYSTONE_PUBLIC_ENDPOINT_TLS=$(echo "$KEYSTONE_PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
     if [ "$KEYSTONE_PUBLIC_ENDPOINT_TLS" == "true" ]
-        then
+        then tls_dir=/etc/keystone/tls
             export KEYSTONE_PROTO="https"
             sed -i "s|5000>|$KEYSTONE_PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server_crt.pem\n\tSSLCertificateKeyFile $tls_dir/server_key.pem\n\tSSLCertificateChainFile $tls_dir/ca_chain.pem\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
         else
