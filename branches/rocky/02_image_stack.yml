@@ -25,14 +25,31 @@ services:
     secrets:
       - source: ca_chain.pem
         target: "/etc/glance/ca_chain.pem"
-        uid: '163'
-        gid: '163'
+        uid: '161'
+        gid: '161'
         mode: 0644
+
+      - source: server_key.pem
+        target: /etc/glance/tls/server_key.pem
+        uid: '161'
+        gid: '161'
+        mode: 0400
+
+      - source: server_crt.pem
+        target: /etc/glance/tls/server_crt.pem
+        uid: '161'
+        gid: '161'
+        mode: 0644
+
     environment:
       - DOCKER_HOST_ADDR=${DOCKER_HOST_ADDR}
 
 secrets:
   ca_chain.pem:
     file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/certs/ca-chain.cert.pem
+  server_key.pem:
+    file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/private/$target_host.key.pem
+  server_crt.pem:
+    file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/certs/$target_host.cert.pem
 
 

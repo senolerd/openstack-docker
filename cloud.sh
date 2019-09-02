@@ -72,7 +72,7 @@ test(){
          fi
     
     if hash openstack 2>/dev/null; then
-      openstack image list --os-username admin \
+      openstack user list --os-username admin \
                           --os-password $ADMIN_PASS \
                           --os-user-domain-name default \
                           --os-project-name admin \

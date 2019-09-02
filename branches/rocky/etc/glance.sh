@@ -83,13 +83,14 @@ function take_token(){
 function glance_api_setup(){
     echo "glance_api_setup started"
     echo "#### REMOVE ME: GLANCE KEYSTONE INTERNAL PROTO: $KEYSTONE_PROTO "
-
+    export glance_cert=""
     GLANCE_PUBLIC_ENDPOINT_TLS=$(echo "$GLANCE_PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
     GLANCE_INTERNAL_ENDPOINT_TLS=$(echo "$GLANCE_INTERNAL_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
     GLANCE_ADMIN_ENDPOINT_TLS=$(echo "$GLANCE_ADMIN_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
 
     if [ "$GLANCE_PUBLIC_ENDPOINT_TLS" == "true" ]
-        then GLANCE_PUB_PROTO="https";
+        then GLANCE_PUB_PROTO="https"
+             glance_cert="ca_file=\n/etc/glance/ca_chain.pem \ncert_file=/etc/glance/tls/server_key.pem \nkey_file=/etc/glance/tls/server_crt.pem 
         else GLANCE_PUB_PROTO="http"
     fi
 
@@ -200,6 +201,7 @@ function server_configuration(){
         sed -i "s|^\[database]|[database]\nconnection = mysql+pymysql://$GLANCE_DB_USER:$GLANCE_USER_DB_PASS@$MYSQL_HOST/$GLANCE_DB_NAME|g" $conf_file
         sed -i "s|^\[keystone_authtoken]|$keystone_authtoken|g" $conf_file
         sed -i "s|^\[paste_deploy]|[paste_deploy]\nflavor = keystone\n|g" $conf_file
+        sed -i "s|^\[DEFAULT]|[DEFAULT]$glance_cert|g" $conf_file
       done
 
     sed -i "s|^\[glance_store]|$glance_store|g" /etc/glance/glance-api.conf
