@@ -91,7 +91,7 @@ function glance_api_setup(){
     if [ "$GLANCE_PUBLIC_ENDPOINT_TLS" == "true" ]
         then 
              GLANCE_PUB_PROTO="https"
-             glance_cert="ca_file=\n/etc/glance/ca_chain.pem \ncert_file=/etc/glance/tls/server_key.pem \nkey_file=/etc/glance/tls/server_crt.pem" 
+             glance_cert="ca_file=\n/ca_file=etc/glance/ca_chain.pem \ncert_file=/etc/glance/tls/server_key.pem \nkey_file=/etc/glance/tls/server_crt.pem" 
         else 
              GLANCE_PUB_PROTO="http"
     fi
