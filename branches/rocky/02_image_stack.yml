@@ -24,3 +24,15 @@ services:
       - ${base}/openstack.env
     environment:
       - DOCKER_HOST_ADDR=${DOCKER_HOST_ADDR}
+   secrets:
+      - source: ca_chain.pem
+        target: ca_chain.pem
+        uid: '163'
+        gid: '163'
+        mode: 0644
+
+secrets:
+  ca_chain.pem:
+    file: ${base}/branches/${OS_VERSION}/etc/ca/intermediate/certs/ca-chain.cert.pem
+
+

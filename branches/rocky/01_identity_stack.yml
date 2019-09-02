@@ -78,7 +78,6 @@ services:
         gid: '163'
         mode: 0644
 
-
   keystone-db:
     image: ${MYSQL_DOCKER_IMAGE}
     ports:

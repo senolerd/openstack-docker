@@ -156,12 +156,12 @@ function glance_api_setup(){
 
     if openstack endpoint list --service glance --interface internal /dev/null 2>&1
       then echo "'glance' internal endpoint exist."
-      else openstack endpoint create --region $REGION image internal $GLANCE_INT_PROTO://$GLANCE_HOST:$GLANCE_INTERNAL_ENDPOINT_PORT $OS_ARGS
+      else openstack endpoint create --region $REGION image internal $GLANCE_INT_PROTO://$DOCKER_HOST_ADDR:$GLANCE_INTERNAL_ENDPOINT_PORT $OS_ARGS
     fi
 
     if openstack endpoint list --service glance --interface admin /dev/null 2>&1
       then echo "'glance' public endpoint exist."
-      else openstack endpoint create --region $REGION image admin $GLANCE_ADM_PROTO://$GLANCE_HOST:$GLANCE_ADMIN_ENDPOINT_PORT $OS_ARGS
+      else openstack endpoint create --region $REGION image admin $GLANCE_ADM_PROTO://$DOCKER_HOST_ADDR:$GLANCE_ADMIN_ENDPOINT_PORT $OS_ARGS
     fi
 
     # Token revoke
