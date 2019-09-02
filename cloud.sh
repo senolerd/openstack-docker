@@ -51,6 +51,7 @@ purge(){
     docker -D stack rm OS_$stack_name
     echo "-----------"
     docker network remove $OVERLAY_NET_NAME 2> /dev/null
+    rm -rf $base/branches/$OS_VERSION/etc/ca
     done
     }
 
