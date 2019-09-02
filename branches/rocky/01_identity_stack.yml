@@ -36,25 +36,25 @@ services:
       - DOCKER_HOST_ADDR=${DOCKER_HOST_ADDR}
     secrets:
       - source: credential_0
-        target: /etc/keystone/credential-keys/credential_0
+        target: /etc/keystone/credential-keys/0
         uid: '163'
         gid: '163'
         mode: 0600
 
       - source: credential_1
-        target: /etc/keystone/credential-keys/credential_1
+        target: /etc/keystone/credential-keys/1
         uid: '163'
         gid: '163'
         mode: 0600
 
       - source: fernet_0
-        target: /etc/keystone/fernet-keys/fernet_0
+        target: /etc/keystone/fernet-keys/0
         uid: '163'
         gid: '163'
         mode: 0600
 
       - source: fernet_1
-        target: /etc/keystone/fernet-keys/fernet_1
+        target: /etc/keystone/fernet-keys/1
         uid: '163'
         gid: '163'
         mode: 0600

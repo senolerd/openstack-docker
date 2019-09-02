@@ -1,15 +1,17 @@
 #!/bin/bash
 started=$(date +%s)
 
-KEYSTONE_INTERNAL_ENDPOINT_TLS=$(echo "$KEYSTONE_INTERNAL_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
-if [ "$KEYSTONE_INTERNAL_ENDPOINT_TLS" == "true" ]
-  then KEYSTONE_PROTO="https"
-  else KEYSTONE_PROTO="http"
-fi
-
     yum install -y centos-release-openstack-$OS_VERSION  httpd mod_wsgi mariadb
     yum install -y openstack-glance python-openstackclient
     echo "# INFO: GLANCE package installing done. #"
+
+    KEYSTONE_INTERNAL_ENDPOINT_TLS=$(echo "$KEYSTONE_INTERNAL_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
+    if [ "$KEYSTONE_INTERNAL_ENDPOINT_TLS" == "true" ]
+      then 
+        KEYSTONE_PROTO="https";
+        cert="cafile = /etc/glance/ca_chain.pem"
+      else KEYSTONE_PROTO="http"
+    fi
 
 function create_db(){
     echo "create_db started"
@@ -80,7 +82,6 @@ function take_token(){
 
 function glance_api_setup(){
     echo "glance_api_setup started"
-    cert=""
     echo "#### REMOVE ME: GLANCE KEYSTONE INTERNAL PROTO: $KEYSTONE_PROTO "
 
     GLANCE_PUBLIC_ENDPOINT_TLS=$(echo "$GLANCE_PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
@@ -88,7 +89,7 @@ function glance_api_setup(){
     GLANCE_ADMIN_ENDPOINT_TLS=$(echo "$GLANCE_ADMIN_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
 
     if [ "$GLANCE_PUBLIC_ENDPOINT_TLS" == "true" ]
-        then GLANCE_PUB_PROTO="https"; cert="cafile = /etc/glance/ca_chain.pem"
+        then GLANCE_PUB_PROTO="https";
         else GLANCE_PUB_PROTO="http"
     fi
 
@@ -166,8 +167,14 @@ function glance_api_setup(){
 
 
 
+
 # SET CONFIG FILES
 function server_configuration(){
+    cert=""
+    if [ "$KEYSTONE_PROTO" == "https" ]
+       then cert="cafile = /etc/glance/ca_chain.pem"
+    fi
+
     echo "server_configuration started"
     keystone_authtoken="\
     \n[keystone_authtoken] \
@@ -187,9 +194,6 @@ function server_configuration(){
     \ndefault_store = file \
     \nfilesystem_store_datadir = /var/lib/glance/images/ \
     "
-
-
-
 
     for conf_file in /etc/glance/glance-api.conf /etc/glance/glance-registry.conf ;
       do
@@ -214,7 +218,7 @@ end=$(date +%s)
 echo "# INFO: GLANCE $OS_VERSION installing report: (started: $start, ended: $end, took $(expr $end - $started) secs )"
 glance-control api start
 
-sleep 111d
+sleep 1111d
 
 
 

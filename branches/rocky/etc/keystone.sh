@@ -36,8 +36,8 @@ function check_permissions(){
     }
 
 function keystone_setup(){
-    mkdir /etc/keystone/fernet-keys
-    mkdir /etc/keystone/credential-keys
+    # mkdir /etc/keystone/fernet-keys
+    # mkdir /etc/keystone/credential-keys
 
     sed -i "s|^\[database]|[database]\nconnection = mysql+pymysql://$KEYSTONE_DB_USER:$KEYSTONE_USER_DB_PASS@$MYSQL_HOST/$KEYSTONE_DB_NAME|g" /etc/keystone/keystone.conf
     sed -i "s|^\[token]|[token]\nprovider = fernet\ncaching = true|g" /etc/keystone/keystone.conf
@@ -51,17 +51,9 @@ function keystone_setup(){
     KEYSTONE_PUBLIC_ENDPOINT_TLS=$(echo "$KEYSTONE_PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
     if [ "$KEYSTONE_PUBLIC_ENDPOINT_TLS" == "true" ]
         then
-            echo "########## HTTPS INSTALL     ############"
             export KEYSTONE_PROTO="https"
-            
-            tls_dir="/etc/keystone/tls"
-            mkdir $tls_dir
-            ln -s /run/secrets/server_key.pem $tls_dir/server_key.pem
-            ln -s /run/secrets/server_crt.pem $tls_dir/server_crt.pem
-            ln -s /run/secrets/ca_chain.pem $tls_dir/ca_chain.pem            
             sed -i "s|5000>|$KEYSTONE_PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server_crt.pem\n\tSSLCertificateKeyFile $tls_dir/server_key.pem\n\tSSLCertificateChainFile $tls_dir/ca_chain.pem\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
         else
-            echo "########## HTTP INSTALL      ############"
             export KEYSTONE_PROTO="http"
     fi
     }
