@@ -80,7 +80,7 @@ function take_token(){
 
 function glance_api_setup(){
     echo "glance_api_setup started"
-
+    cert=""
     echo "#### REMOVE ME: GLANCE KEYSTONE INTERNAL PROTO: $KEYSTONE_PROTO "
 
     GLANCE_PUBLIC_ENDPOINT_TLS=$(echo "$GLANCE_PUBLIC_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
@@ -88,25 +88,19 @@ function glance_api_setup(){
     GLANCE_ADMIN_ENDPOINT_TLS=$(echo "$GLANCE_ADMIN_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
 
     if [ "$GLANCE_PUBLIC_ENDPOINT_TLS" == "true" ]
-        then echo "########## GLANCE PUBLIC HTTPS INSTALL ##"
-             GLANCE_PUB_PROTO="https"
+        then GLANCE_PUB_PROTO="https"; cert="cafile = /etc/glance/ca_chain.pem"
         else GLANCE_PUB_PROTO="http"
-             echo "########## GLANCE PUBLIC HTTP INSTALL ###"
     fi
 
     if [ "$GLANCE_INTERNAL_ENDPOINT_TLS" == "true" ]
-        then echo "########## GLANCE INTERNAL HTTPS INSTALL ##"
-             GLANCE_INT_PROTO="https"
+        then GLANCE_INT_PROTO="https"
         else GLANCE_INT_PROTO="http"
-             echo "########## GLANCE INTERNAL HTTP INSTALL ###"
     fi
 
 
     if [ "$GLANCE_ADMIN_ENDPOINT_TLS" == "true" ]
-        then echo "########## GLANCE ADMIN HTTPS INSTALL ##"
-             GLANCE_ADM_PROTO="https"
+        then GLANCE_ADM_PROTO="https"
         else GLANCE_ADM_PROTO="http"
-             echo "########## GLANCE ADMIN HTTP INSTALL ###"
     fi
 
     while true
@@ -177,7 +171,7 @@ function server_configuration(){
     echo "server_configuration started"
     keystone_authtoken="\
     \n[keystone_authtoken] \
-    \nauth_url = $KEYSTONE_PROTO://$KEYSTONE_HOST:$KEYSTONE_INTERNAL_ENDPOINT_PORT \
+    \nauth_url = $KEYSTONE_PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_INTERNAL_ENDPOINT_PORT \
     \nmemcached_servers = $MEMCACHED_HOST:$MEMCACHED_PORT \
     \nauth_type = password \
     \nproject_domain_name = Default \
@@ -185,7 +179,7 @@ function server_configuration(){
     \nproject_name = service \
     \nusername = $GLANCE_SERVICE_USERNAME \
     \npassword = $GLANCE_SERVICE_USER_PASS \
-    \ninsecure = true\
+    \n$cert \
     "
     glance_store="\
     \n[glance_store] \
@@ -193,6 +187,9 @@ function server_configuration(){
     \ndefault_store = file \
     \nfilesystem_store_datadir = /var/lib/glance/images/ \
     "
+
+
+
 
     for conf_file in /etc/glance/glance-api.conf /etc/glance/glance-registry.conf ;
       do

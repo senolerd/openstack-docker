@@ -44,11 +44,6 @@ function keystone_setup(){
     sed -i "s|^\[cache]|[cache]\nenable = true \nbackend = dogpile.cache.memcached \nbackend_argument = url:$MEMCACHED_HOST:$MEMCACHED_PORT |g" /etc/keystone/keystone.conf
 
     chown keystone:keystone /etc/keystone/fernet-keys /etc/keystone/credential-keys
-    chmod 700 /etc/keystone/fernet-keys /etc/keystone/credential-keys
-    ln -s /run/secrets/fernet_0 /etc/keystone/fernet-keys/0
-    ln -s /run/secrets/fernet_1 /etc/keystone/fernet-keys/1
-    ln -s /run/secrets/credential_0 /etc/keystone/credential-keys/0
-    ln -s /run/secrets/credential_1 /etc/keystone/credential-keys/1
     ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
     sed -i "s|Listen 5000|Listen 5000\nServerName $DOCKER_HOST_ADDR|g" /etc/httpd/conf.d/wsgi-keystone.conf
 
@@ -57,7 +52,8 @@ function keystone_setup(){
     if [ "$KEYSTONE_PUBLIC_ENDPOINT_TLS" == "true" ]
         then
             echo "########## HTTPS INSTALL     ############"
-            PROTO="https"
+            export KEYSTONE_PROTO="https"
+            
             tls_dir="/etc/keystone/tls"
             mkdir $tls_dir
             ln -s /run/secrets/server_key.pem $tls_dir/server_key.pem
@@ -66,7 +62,7 @@ function keystone_setup(){
             sed -i "s|5000>|$KEYSTONE_PUBLIC_ENDPOINT_PORT>\n\tSSLEngine on\n\tSSLCertificateFile $tls_dir/server_crt.pem\n\tSSLCertificateKeyFile $tls_dir/server_key.pem\n\tSSLCertificateChainFile $tls_dir/ca_chain.pem\n |g" /etc/httpd/conf.d/wsgi-keystone.conf
         else
             echo "########## HTTP INSTALL      ############"
-            PROTO="http"
+            export KEYSTONE_PROTO="http"
     fi
     }
 
@@ -74,11 +70,11 @@ function populate_keystone(){
     echo "# INFO: DB populate."
     su -s /bin/sh -c "keystone-manage db_sync" keystone
 
-    echo "# INFO: Bootstrap, Prpto: \'$PROTO\', DOCKER_HOST: \'$DOCKER_HOST_ADDR\', \'$KEYSTONE_PUBLIC_ENDPOINT_PORT\'"
+    echo "# INFO: Bootstrap, Prpto: \'$KEYSTONE_PROTO\', DOCKER_HOST: \'$DOCKER_HOST_ADDR\', \'$KEYSTONE_PUBLIC_ENDPOINT_PORT\'"
     keystone-manage bootstrap --bootstrap-password $ADMIN_PASS \
-    --bootstrap-public-url $PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_PUBLIC_ENDPOINT_PORT \
-    --bootstrap-internal-url $PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_INTERNAL_ENDPOINT_PORT \
-    --bootstrap-admin-url $PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_ADMIN_ENDPOINT_PORT \
+    --bootstrap-public-url $KEYSTONE_PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_PUBLIC_ENDPOINT_PORT \
+    --bootstrap-internal-url $KEYSTONE_PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_INTERNAL_ENDPOINT_PORT \
+    --bootstrap-admin-url $KEYSTONE_PROTO://$DOCKER_HOST_ADDR:$KEYSTONE_ADMIN_ENDPOINT_PORT \
     --bootstrap-region-id $REGION
   }
 

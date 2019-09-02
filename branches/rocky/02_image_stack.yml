@@ -22,14 +22,14 @@ services:
       - 8.8.8.8
     env_file:
       - ${base}/openstack.env
-    environment:
-      - DOCKER_HOST_ADDR=${DOCKER_HOST_ADDR}
-   secrets:
+    secrets:
       - source: ca_chain.pem
-        target: ca_chain.pem
+        target: "/etc/glance/ca_chain.pem"
         uid: '163'
         gid: '163'
         mode: 0644
+    environment:
+      - DOCKER_HOST_ADDR=${DOCKER_HOST_ADDR}
 
 secrets:
   ca_chain.pem:

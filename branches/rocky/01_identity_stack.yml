@@ -9,7 +9,6 @@ networks:
 #   default:
 #     name: ${OVERLAY_NET_NAME}
 
-
 services:
   keystone-api:
     image: ${KEYSTONE_DOCKER_IMAGE}
@@ -37,43 +36,43 @@ services:
       - DOCKER_HOST_ADDR=${DOCKER_HOST_ADDR}
     secrets:
       - source: credential_0
-        target: credential_0
+        target: /etc/keystone/credential-keys/credential_0
         uid: '163'
         gid: '163'
         mode: 0600
 
       - source: credential_1
-        target: credential_1
+        target: /etc/keystone/credential-keys/credential_1
         uid: '163'
         gid: '163'
         mode: 0600
 
       - source: fernet_0
-        target: fernet_0
+        target: /etc/keystone/fernet-keys/fernet_0
         uid: '163'
         gid: '163'
         mode: 0600
 
       - source: fernet_1
-        target: fernet_1
+        target: /etc/keystone/fernet-keys/fernet_1
         uid: '163'
         gid: '163'
         mode: 0600
 
       - source: server_key.pem
-        target: server_key.pem
+        target: /etc/keystone/tls/server_key.pem
         uid: '163'
         gid: '163'
         mode: 0400
 
       - source: server_crt.pem
-        target: server_crt.pem
+        target: /etc/keystone/tls/server_crt.pem
         uid: '163'
         gid: '163'
         mode: 0644
 
       - source: ca_chain.pem
-        target: ca_chain.pem
+        target: /etc/keystone/tls/ca_chain.pem
         uid: '163'
         gid: '163'
         mode: 0644

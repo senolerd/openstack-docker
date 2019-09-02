@@ -71,8 +71,8 @@ test(){
              PROTO="http"
          fi
     
-    if hash openstacka 2>/dev/null; then
-      openstack user list --os-username admin \
+    if hash openstack 2>/dev/null; then
+      openstack image list --os-username admin \
                           --os-password $ADMIN_PASS \
                           --os-user-domain-name default \
                           --os-project-name admin \
