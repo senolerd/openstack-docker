@@ -89,20 +89,26 @@ function glance_api_setup(){
     GLANCE_ADMIN_ENDPOINT_TLS=$(echo "$GLANCE_ADMIN_ENDPOINT_TLS" | tr '[:upper:]' '[:lower:]')
 
     if [ "$GLANCE_PUBLIC_ENDPOINT_TLS" == "true" ]
-        then GLANCE_PUB_PROTO="https"
+        then 
+             GLANCE_PUB_PROTO="https"
              glance_cert="ca_file=\n/etc/glance/ca_chain.pem \ncert_file=/etc/glance/tls/server_key.pem \nkey_file=/etc/glance/tls/server_crt.pem" 
-        else GLANCE_PUB_PROTO="http"
+        else 
+             GLANCE_PUB_PROTO="http"
     fi
 
     if [ "$GLANCE_INTERNAL_ENDPOINT_TLS" == "true" ]
-        then GLANCE_INT_PROTO="https"
-        else GLANCE_INT_PROTO="http"
+        then 
+             GLANCE_INT_PROTO="https"
+        else 
+             GLANCE_INT_PROTO="http"
     fi
 
 
     if [ "$GLANCE_ADMIN_ENDPOINT_TLS" == "true" ]
-        then GLANCE_ADM_PROTO="https"
-        else GLANCE_ADM_PROTO="http"
+        then 
+             GLANCE_ADM_PROTO="https"
+        else 
+             GLANCE_ADM_PROTO="http"
     fi
 
     while true
