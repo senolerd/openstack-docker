@@ -18,11 +18,12 @@ function create_db(){
 
     while true
       do
-        if mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "use $GLANCE_DB_NAME;" ;
+        if mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "use $GLANCE_DB_NAME;" > /dev/null ;
           then
             echo "INFO: GLANCE DB exist, heading to server configuration."
             break
           else
+            echo "INFO: GLANCE DB could not found. New DB is being created."
             mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE $GLANCE_DB_NAME;"
             mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $GLANCE_DB_NAME.* TO '$GLANCE_DB_USER'@'%' IDENTIFIED BY '$GLANCE_USER_DB_PASS';"
             mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $GLANCE_DB_NAME.* TO '$GLANCE_DB_USER'@'localhost' IDENTIFIED BY '$GLANCE_USER_DB_PASS';"
