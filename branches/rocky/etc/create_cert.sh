@@ -22,7 +22,7 @@ create_root_ca(){
     touch index.txt
     echo 1000 > serial
     
-    sed    -e "s,/root/ca,$cur_dir/ca," \
+    sed    -e "s,ROOT_CA_DIR,$cur_dir/ca," \
            -e "s,COMPANY_NAME,$COMPANY_NAME," \
            -e "s,COUNTRY_NAME,$COUNTRY_NAME," \
            -e "s,STATE_OR_PROVINCE,$STATE_OR_PROVINCE," \
