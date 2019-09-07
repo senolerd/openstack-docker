@@ -18,7 +18,7 @@ function create_db(){
 
     while true
       do
-        if mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "use $GLANCE_DB_NAME;" > /dev/null ;
+        if mysql -u root -h $MYSQL_HOST -p$MYSQL_ROOT_PASSWORD -e "use $GLANCE_DB_NAME;" 2> /dev/null ;
           then
             echo "INFO: GLANCE DB exist, heading to server configuration."
             break
